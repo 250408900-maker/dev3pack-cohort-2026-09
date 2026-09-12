@@ -68,7 +68,15 @@ def main() -> int:
             result.answer.needs_human_review,
         )
 
-    warn(".env present", (ROOT / ".env").is_file(), "cp .env.example .env (optional for now)")
+    # The label is what a reader SEES, so it has to describe the state found,
+    # not the condition tested. ".env present -> cp .env.example .env" told a
+    # fresh clone that the file is present and therefore should be created.
+    _has_env = (ROOT / ".env").is_file()
+    warn(
+        ".env present" if _has_env else "no .env yet",
+        _has_env,
+        "cp .env.example .env (optional for now — every scored notebook runs without it)",
+    )
 
     if (ROOT / ".env").is_file():
         from bootcamp_agent.config import ConfigError, load_settings

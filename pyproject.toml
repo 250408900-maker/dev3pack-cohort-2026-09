@@ -39,6 +39,10 @@ dev = [
   "nbformat>=5.10",
   "nbclient>=0.10",
   "ipykernel>=6.29",
+  # The last line of README "Start here" is `uv run jupyter lab`, and without
+  # this it answers "Jupyter command `jupyter-lab` not found" and exits 0 —
+  # so a learner is told to open 00-START-HERE.ipynb with nothing to open it.
+  "jupyterlab>=4.2",
   "pyyaml>=6.0",
   "mcp>=2",  # 2.x renamed FastMCP to MCPServer; the deck predates the rename
 ]

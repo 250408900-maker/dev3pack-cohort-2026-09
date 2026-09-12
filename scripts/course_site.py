@@ -233,17 +233,30 @@ def groups() -> list[dict[str, object]]:
             }
         )
 
+    # WHY "TOPIC" AND NOT "UNIT" HERE. The prerequisite material was numbered
+    # `Unit 1 … Unit 12` while the three teaching weeks are also `unit1 … unit3`
+    # on disk and in every path, so the sidebar carried two different "Unit 1"
+    # and a reader had no way to tell which one anybody meant. The weeks keep
+    # the word; the prerequisite items are topics, and all of it is Unit 0,
+    # because "Week 0" was a third name for the same material.
     for course in WEEK0_COURSES:
         sections: list[dict[str, str]] = []
         for unit in WEEK0_UNITS:
             if unit.course == course:
-                sections += _sections(unit.directory, f"Unit {unit.number}. {unit.title}")
-        out.append({"title": f"Week 0. {course}", "sections": sections})
+                sections += _sections(unit.directory, f"Topic {unit.number}. {unit.title}")
+        out.append({"title": f"Unit 0 · {course}", "sections": sections})
 
     for chapter in CHAPTERS:
+        # `Unit <week>.<n>` names where a session sits, the way Hugging Face
+        # writes Unit 2.1, 2.2, 2.3 — so a collapsed sidebar still says which
+        # week a session belongs to.
+        nth = [c for c in CHAPTERS if c.module == chapter.module].index(chapter) + 1
         out.append(
             {
-                "title": f"Session {chapter.number}. {chapter.title} — {chapter.weekday}",
+                "title": (
+                    f"Unit {chapter.module}.{nth} · Session {chapter.number}. "
+                    f"{chapter.title} — {chapter.weekday}"
+                ),
                 "sections": _sections(chapter.directory, "Introduction"),
             }
         )
@@ -253,7 +266,7 @@ def groups() -> list[dict[str, object]]:
         if chapter is last_of_week and chapter.module == CAPSTONE.opens_in_week:
             out.append(
                 {
-                    "title": CAPSTONE.title,
+                    "title": f"Unit {CAPSTONE.opens_in_week} · {CAPSTONE.title}",
                     "sections": _sections(CAPSTONE.directory, "Introduction"),
                 }
             )

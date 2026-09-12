@@ -72,13 +72,22 @@ nav.side{background:var(--side);border-right:1px solid var(--line);padding:22px 
 overflow-y:auto;max-height:100vh;position:sticky;top:0}
 nav.side h1{font-size:15px;margin:0 0 18px}
 nav.side h1 a{color:var(--fg);text-decoration:none}
-nav.side .group{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-color:var(--muted);margin:20px 0 7px}
+nav.side details.group{margin:2px 0}
+nav.side details.group>summary{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+color:var(--muted);margin:14px 0 6px;cursor:pointer;list-style:none;line-height:1.45}
+nav.side details.group>summary::-webkit-details-marker{display:none}
+nav.side details.group>summary::before{content:"\\25b8";display:inline-block;width:1em;
+font-size:9px;transition:transform .12s}
+nav.side details.group[open]>summary::before{transform:rotate(90deg)}
+nav.side details.group>summary:hover{color:var(--accent)}
+nav.side details.group>a.page{margin-left:1em}
 nav.side a.page{display:block;padding:5px 9px;border-radius:6px;color:var(--fg);
 text-decoration:none;font-size:14px}
 nav.side a.page:hover{background:var(--line)}
 nav.side a.page[aria-current]{background:var(--line);font-weight:600}
 main{padding:40px 52px 90px;max-width:860px}
+aside.onthispage .onthispage-title{font-size:11px;letter-spacing:.08em;
+text-transform:uppercase;color:var(--muted);margin:0 0 7px}
 aside.onthispage{padding:40px 18px;font-size:13px;position:sticky;top:0;
 max-height:100vh;overflow-y:auto}
 aside.onthispage a{display:block;color:var(--muted);text-decoration:none;padding:3px 0}
@@ -137,18 +146,31 @@ def _depth(local: str) -> str:
 
 
 def _sidebar(groups: list[tuple[str, list[Entry]]], here: str) -> str:
+    """The contents, one collapsible group per unit, the current one open.
+
+    Thirty groups listed flat is a wall nobody reads past; collapsed, the whole
+    course is a screen and a reader opens the week they are in. `<details>`
+    again, for the same reason the quiz uses it: no JavaScript, so it works with
+    the script blocked and renders the same everywhere.
+    """
     up = _depth(here)
     out = [f'<h1><a href="{up}index.html">Dev3Pack AI-Engineering Bootcamp</a></h1>']
     for title, entries in groups:
         if not entries:
             continue
-        out.append(f'<p class="group">{html.escape(title)}</p>')
+        # Open the group holding the page being read, and nothing else. On the
+        # index redirect nothing matches, so the reader lands on a closed list
+        # and sees the shape of the course before any one page of it.
+        current_group = any(entry.local == here for entry in entries)
+        out.append(f'<details class="group"{" open" if current_group else ""}>')
+        out.append(f"<summary>{html.escape(title)}</summary>")
         for entry in entries:
             current = ' aria-current="page"' if entry.local == here else ""
             out.append(
                 f'<a class="page" href="{up}{entry.local}.html"{current}>'
                 f"{html.escape(entry.title)}</a>"
             )
+        out.append("</details>")
     return "\n".join(out)
 
 
@@ -160,7 +182,7 @@ def _onthispage(page: Page) -> str:
     ]
     if not links:
         return ""
-    return '<p class="group">On this page</p>' + "".join(links)
+    return '<p class="onthispage-title">On this page</p>' + "".join(links)
 
 
 def _pager(entries: list[Entry], position: int) -> str:

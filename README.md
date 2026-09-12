@@ -45,7 +45,7 @@ works too. HTTPS is above because it needs nothing configured first.
 
 Open **`00-START-HERE.ipynb`**. It lists every notebook in order and ticks what you have finished.
 
-New to the repo? [`SETUP.md`](SETUP.md) is the half-hour path to a green doctor. No API key is required: every scored notebook runs offline against `FakeLLM`. The repository is private and read-only; week 0 is here now, later weeks land on 14 / 21 / 28 September — `git pull` at the start of each week.
+New to the repo? [`SETUP.md`](SETUP.md) is the half-hour path to a green doctor. No API key is required: every scored notebook runs offline against `FakeLLM`. This repository is read-only for you — open a pull request against the submissions repository rather than this one; week 0 is here now, later weeks land on 14 / 21 / 28 September — `git pull` at the start of each week.
 
 ## For coding assistants
 

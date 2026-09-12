@@ -17,39 +17,39 @@
     title: "Week 2 — Retrieval, graphs, evaluation, skills"
   - local: unit0/week3
     title: "Week 3 — State, MCP, deployment, defense"
-- title: "Week 0. The fast lane"
+- title: "Unit 0 · The fast lane"
   sections:
   - local: unit0/w01-environment/introduction
-    title: "Unit 1. The environment"
+    title: "Topic 1. The environment"
   - local: unit0/w02-packages-and-docs/introduction
-    title: "Unit 2. Packages and documentation"
+    title: "Topic 2. Packages and documentation"
   - local: unit0/w03-classes-and-contracts/introduction
-    title: "Unit 3. Classes and contracts"
+    title: "Topic 3. Classes and contracts"
   - local: unit0/w04-real-apis/introduction
-    title: "Unit 4. Calling a real API"
-- title: "Week 0. Course A — Software engineering foundations"
+    title: "Topic 4. Calling a real API"
+- title: "Unit 0 · Course A — Software engineering foundations"
   sections:
   - local: unit0/w05-packages-and-pep8/introduction
-    title: "Unit 5. Packages, PyPI and PEP 8"
+    title: "Topic 5. Packages, PyPI and PEP 8"
   - local: unit0/w06-portable-packages/introduction
-    title: "Unit 6. A portable package"
+    title: "Topic 6. A portable package"
   - local: unit0/w07-classes-in-packages/introduction
-    title: "Unit 7. Classes in a package"
+    title: "Topic 7. Classes in a package"
   - local: unit0/w08-docs-tests-readability/introduction
-    title: "Unit 8. Documentation, tests and readability"
-- title: "Week 0. Course B — MCP: AI apps as easy as 1, 2, 3"
+    title: "Topic 8. Documentation, tests and readability"
+- title: "Unit 0 · Course B — MCP: AI apps as easy as 1, 2, 3"
   sections:
   - local: unit0/w09-mcp-first-server/introduction
-    title: "Unit 9. Your first MCP server"
+    title: "Topic 9. Your first MCP server"
   - local: unit0/w10-mcp-resources-prompts-llms/introduction
-    title: "Unit 10. Resources, prompts, and the LLM"
+    title: "Topic 10. Resources, prompts, and the LLM"
   - local: unit0/w11-mcp-data-apis-third-party/introduction
-    title: "Unit 11. Databases, APIs, and third-party servers"
-- title: "Week 0. Course C — Data structures for agents"
+    title: "Topic 11. Databases, APIs, and third-party servers"
+- title: "Unit 0 · Course C — Data structures for agents"
   sections:
   - local: unit0/w12-dsa-for-agents/introduction
-    title: "Unit 12. Data structures for agents"
-- title: "Session 1. Configure the assistant and the repository instructions — Mon 14 Sep"
+    title: "Topic 12. Data structures for agents"
+- title: "Unit 1.1 · Session 1. Configure the assistant and the repository instructions — Mon 14 Sep"
   sections:
   - local: unit1/session-01-assistant-configuration/introduction
     title: "Introduction"
@@ -63,7 +63,7 @@
     title: "Quick quiz (ungraded)"
   - local: unit1/session-01-assistant-configuration/conclusion
     title: "Conclusion"
-- title: "Session 2. Call a model through the adapter — Tue 15 Sep"
+- title: "Unit 1.2 · Session 2. Call a model through the adapter — Tue 15 Sep"
   sections:
   - local: unit1/session-02-model-adapter/introduction
     title: "Introduction"
@@ -77,7 +77,7 @@
     title: "Quick quiz (ungraded)"
   - local: unit1/session-02-model-adapter/conclusion
     title: "Conclusion"
-- title: "Session 3. Structured outputs — Wed 16 Sep"
+- title: "Unit 1.3 · Session 3. Structured outputs — Wed 16 Sep"
   sections:
   - local: unit1/session-03-structured-outputs/introduction
     title: "Introduction"
@@ -91,7 +91,7 @@
     title: "Quick quiz (ungraded)"
   - local: unit1/session-03-structured-outputs/conclusion
     title: "Conclusion"
-- title: "Session 4. Bounded tools — Thu 17 Sep"
+- title: "Unit 1.4 · Session 4. Bounded tools — Thu 17 Sep"
   sections:
   - local: unit1/session-04-bounded-tools/introduction
     title: "Introduction"
@@ -105,7 +105,7 @@
     title: "Quick quiz (ungraded)"
   - local: unit1/session-04-bounded-tools/conclusion
     title: "Conclusion"
-- title: "Session 5. A deterministic mini-agent — Fri 18 Sep"
+- title: "Unit 1.5 · Session 5. A deterministic mini-agent — Fri 18 Sep"
   sections:
   - local: unit1/session-05-deterministic-mini-agent/introduction
     title: "Introduction"
@@ -158,14 +158,14 @@
 
 # Not in this repository yet. Each arrives on its Monday and
 # `git pull` brings it; the dates are in the README.
-#   Session 6. A retrieval baseline — Mon 21 Sep
-#   Session 7. Retrieval and grounding metrics — Tue 22 Sep
-#   Session 8. Loops and graphs — Wed 23 Sep
-#   Session 9. Trace and evaluate an agent — Thu 24 Sep
-#   Session 10. Skills and an architecture decision record — Fri 25 Sep
-#   Capstone: the source-grounded research assistant
-#   Session 11. State and memory — Mon 28 Sep
-#   Session 12. MCP architecture and primitives — Tue 29 Sep
-#   Session 13. Build and secure an MCP server — Wed 30 Sep
-#   Session 14. Deploy and operate the capstone — Thu 01 Oct
-#   Session 15. Defend the capstone — Fri 02 Oct
+#   Unit 2.1 · Session 6. A retrieval baseline — Mon 21 Sep
+#   Unit 2.2 · Session 7. Retrieval and grounding metrics — Tue 22 Sep
+#   Unit 2.3 · Session 8. Loops and graphs — Wed 23 Sep
+#   Unit 2.4 · Session 9. Trace and evaluate an agent — Thu 24 Sep
+#   Unit 2.5 · Session 10. Skills and an architecture decision record — Fri 25 Sep
+#   Unit 2 · Capstone: the source-grounded research assistant
+#   Unit 3.1 · Session 11. State and memory — Mon 28 Sep
+#   Unit 3.2 · Session 12. MCP architecture and primitives — Tue 29 Sep
+#   Unit 3.3 · Session 13. Build and secure an MCP server — Wed 30 Sep
+#   Unit 3.4 · Session 14. Deploy and operate the capstone — Thu 01 Oct
+#   Unit 3.5 · Session 15. Defend the capstone — Fri 02 Oct
