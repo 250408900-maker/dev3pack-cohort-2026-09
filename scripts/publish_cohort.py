@@ -35,6 +35,7 @@ import re
 import shutil
 import subprocess
 import sys
+from datetime import date
 from fnmatch import fnmatch
 from pathlib import Path
 
@@ -59,6 +60,9 @@ from bootcamp_agent.curriculum import (  # noqa: E402
 
 #: The weeks a publish can name. Week 0 is the prerequisite; 1-3 are the live weeks.
 WEEKS = (0, 1, 2, 3)
+
+#: `--week auto`, before the destination is known. Resolved in `main`.
+AUTO = -1
 
 
 UNITS = "units/en"
@@ -746,9 +750,65 @@ def _stale(
     return stale
 
 
+def week_in_progress(today: date | None = None) -> int:
+    """The furthest week whose first session has already started.
+
+    The schedule is the authority, never a number somebody types. A session is
+    released on its own date, so the week a merge may publish is a fact about
+    the calendar and `curriculum.py` -- which is what makes publishing on merge
+    safe: content for a later week is withheld no matter what reaches `main`.
+    """
+    day = today or date.today()
+    started = [chapter.module for chapter in CHAPTERS if chapter.on <= day]
+    return max(started, default=0)
+
+
+def week_published(destination: Path) -> int:
+    """The furthest week the student repository already holds.
+
+    Read from the checkout, because that is the only honest record of what
+    learners can see. `--week auto` may never go BELOW this: the publisher
+    withdraws what a week does not include, so an auto-publish that went
+    backwards would delete sessions out from under a cohort mid-week.
+    """
+    if not destination.exists():
+        return 0
+    here = [
+        chapter.module
+        for chapter in CHAPTERS
+        if (destination / chapter.directory.relative_to(ROOT)).is_dir()
+    ]
+    return max(here, default=0)
+
+
+def week_argument(value: str) -> int:
+    """`--week auto` reads the schedule; a number is still accepted verbatim.
+
+    `auto` resolves late, in `main`, because it needs the destination to know
+    what is already out there.
+    """
+    if value == "auto":
+        return AUTO
+    try:
+        number = int(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(
+            f"expected one of {WEEKS} or `auto`, got {value!r}"
+        ) from error
+    if number not in WEEKS:
+        raise argparse.ArgumentTypeError(f"expected one of {WEEKS} or `auto`, got {number}")
+    return number
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--week", type=int, required=True, choices=WEEKS)
+    parser.add_argument(
+        "--week",
+        required=True,
+        type=week_argument,
+        metavar="{0,1,2,3,auto}",
+        help="the week to release, or `auto` to take it from the schedule",
+    )
     parser.add_argument(
         "--into",
         type=Path,
@@ -767,6 +827,15 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     destination = args.into or ROOT.parent / "dev3pack-cohort-2026-09"
+
+    if args.week == AUTO:
+        scheduled, already = week_in_progress(), week_published(destination)
+        args.week = max(scheduled, already)
+        print(f"week auto: schedule says {scheduled}, the cohort repo holds {already}")
+        if already > scheduled:
+            # Not a warning. A week is published the evening before its first
+            # session, so this is the normal state for most of a cohort.
+            print(f"  keeping {already}: a published week is never withdrawn")
 
     # Resolve the requested solutions and refuse any whose week is not open — a
     # solution cannot ship before the exercise it answers.
