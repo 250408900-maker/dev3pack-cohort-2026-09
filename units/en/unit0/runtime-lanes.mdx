@@ -19,6 +19,24 @@ first cell: it fetches the course into the Colab machine and installs it, which
 takes about twenty seconds. Nothing to install on your own computer, and the
 required lane works immediately.
 
+**Thirteen of the fifteen sessions work there. Two do not, and it is worth
+knowing which before Monday.**
+
+Sessions 1 and 10 are *assistant-driven*: you configure a coding assistant to
+read this repository's policy before it edits, then hold it to that boundary
+while it changes `tools.py` and its test. Session 10 has you author a skill and
+compare the runs before and after.
+
+Colab's built-in assistant writes and explains **cells**. It has no notion of
+project instructions, cannot read `AGENTS.md` before acting, and cannot refuse
+an edit outside the files you allowed — which is the whole exercise. So those
+two sessions need a workspace where an assistant edits files: Claude Code,
+Cursor, or another, on your own machine.
+
+If you have no machine to run one on, **GitHub Codespaces** gives you the same
+thing in a browser — a real filesystem, a terminal, and an assistant that edits
+files. Everything else in the course, Colab covers.
+
 If you want a real model without paying for one, Colab can run the same local
 lane this course ships — `qwen2.5:7b-instruct` — on a free GPU. Set the runtime
 to **T4 GPU** first, then in a cell of your own:

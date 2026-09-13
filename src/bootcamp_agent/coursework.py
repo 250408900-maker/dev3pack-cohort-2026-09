@@ -166,6 +166,13 @@ def run_notebook(
             timeout=timeout,
             kernel_name="python3",
             resources={"metadata": {"path": str(notebook_path.parent)}},
+            # ipykernel announces "Kernel is running over TCP without encryption
+            # … susceptible to eavesdropping" on every start. True, and about a
+            # child process on the learner's own machine, so it warns them of
+            # nothing they can act on — while appearing above every `check` they
+            # run. Raising the kernel's log level removes the cause; hiding the
+            # output would also have hidden their own errors.
+            extra_arguments=["--log-level=ERROR"],
         ).execute()
     except Exception as error:  # noqa: BLE001 - any failure is one report line
         raise CourseworkError(f"{type(error).__name__}: {str(error)[:200]}") from error
