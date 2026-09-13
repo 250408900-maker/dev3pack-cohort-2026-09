@@ -413,6 +413,15 @@ def build(out: Path = OUT) -> tuple[int, list[str]]:
     (out / "style.css").write_text(STYLE, encoding="utf-8")
     (out / ".nojekyll").write_text("", encoding="utf-8")
 
+    # The agent-facing files belong at the SITE root, not only the repo root.
+    # An agent follows `<site>/llms.txt`; it never reads raw.githubusercontent.
+    # The Pages workflow uploads `site/` alone, so a file that is not copied
+    # here is a 404 to every reader that matters.
+    for name in ("llms.txt", "AGENTS.md"):
+        source = ROOT / name
+        if source.is_file():
+            shutil.copyfile(source, out / name)
+
     # Only pages that exist go in the sidebar: a week that has not been
     # published yet has no file, and a link to it would 404 rather than teach.
     def prune(group: Group) -> Group:
