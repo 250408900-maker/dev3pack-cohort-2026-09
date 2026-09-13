@@ -65,13 +65,13 @@ STYLE = """
    page this was drawn for. */
 :root{
 --bg:#fff;--panel:#fafafa;--fg:#10121a;--muted:#5d6373;--line:#e4e6ee;
---accent:#1a51e8;--accent-ink:#fff;--code:#f3f4f8;--ok:#0f7a4c;--dot:rgba(16,18,26,.08)}
+--accent:#005efa;--accent-ink:#fff;--code:#f3f4f8;--ok:#005efa;--dot:rgba(16,18,26,.08)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
 --bg:#0a0c14;--panel:#0e111b;--fg:#eef1f8;--muted:#8b93a7;--line:#1d2231;
---accent:#3b6ef6;--accent-ink:#fff;--code:#12161f;--ok:#3fcf8e;--dot:rgba(255,255,255,.07)}}
+--accent:#2b7bff;--accent-ink:#fff;--code:#12161f;--ok:#2b7bff;--dot:rgba(255,255,255,.07)}}
 :root[data-theme="dark"]{
 --bg:#0a0c14;--panel:#0e111b;--fg:#eef1f8;--muted:#8b93a7;--line:#1d2231;
---accent:#3b6ef6;--accent-ink:#fff;--code:#12161f;--ok:#3fcf8e;--dot:rgba(255,255,255,.07)}
+--accent:#2b7bff;--accent-ink:#fff;--code:#12161f;--ok:#2b7bff;--dot:rgba(255,255,255,.07)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);
 font:16px/1.68 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,
@@ -201,7 +201,7 @@ def _group_html(group: Group, here: str, up: str, depth: int) -> str:
 
 def _sidebar(groups: list[Group], here: str) -> str:
     up = _depth(here)
-    out = [f'<h1><a href="{up}index.html">Dev3Pack AI-Engineering Bootcamp</a></h1>']
+    out = [f'<h1><a href="{up}">Dev3Pack AI-Engineering Bootcamp</a></h1>']
     for group in groups:
         if group.walk():
             out.append(_group_html(group, here, up, 0))

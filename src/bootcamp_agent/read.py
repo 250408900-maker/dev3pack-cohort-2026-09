@@ -447,17 +447,17 @@ NOTEBOOK_STYLE = """<style>
 .dev3pack .choice input{position:absolute;opacity:0;width:0;height:0}
 .dev3pack .choice label{display:flex;gap:.7em;align-items:flex-start;cursor:pointer;
 padding:9px 12px;border:1px solid rgba(127,127,127,.28);border-radius:9px}
-.dev3pack .choice label:hover{border-color:#3b6ef6}
+.dev3pack .choice label:hover{border-color:#005efa}
 .dev3pack .choice .box{flex:0 0 auto;width:15px;height:15px;margin-top:.18em;
 border:1.5px solid rgba(127,127,127,.55);border-radius:4px}
-.dev3pack .choice input:checked+label{border-color:#3b6ef6}
-.dev3pack .choice input:checked+label .box{background:#3b6ef6;border-color:#3b6ef6}
-.dev3pack .choice.right input:checked+label{border-color:#1d9a63}
-.dev3pack .choice.right input:checked+label .box{background:#1d9a63;border-color:#1d9a63}
+.dev3pack .choice input:checked+label{border-color:#005efa}
+.dev3pack .choice input:checked+label .box{background:#005efa;border-color:#005efa}
+.dev3pack .choice.right input:checked+label{border-color:#005efa}
+.dev3pack .choice.right input:checked+label .box{background:#005efa;border-color:#005efa}
 .dev3pack .choice .explain{display:none;margin:6px 0 0 2.3em;padding:8px 12px;
 font-size:.94em;opacity:.85;border-left:2px solid rgba(127,127,127,.3)}
 .dev3pack .choice input:checked~.explain{display:block}
-.dev3pack .choice.right input:checked~.explain{border-left-color:#1d9a63}
+.dev3pack .choice.right input:checked~.explain{border-left-color:#005efa}
 .dev3pack code{background:rgba(127,127,127,.14);padding:.12em .35em;border-radius:4px}
 .dev3pack pre{background:rgba(127,127,127,.1);padding:12px;border-radius:8px;overflow-x:auto}
 .dev3pack pre code{background:none;padding:0}
