@@ -1,7 +1,11 @@
 # Claude Code instructions
 
-Follow the canonical assistant policy in [`AGENTS.md`](AGENTS.md) — mission,
-commands, coding rules, and the non-negotiable safety section all live there.
+@AGENTS.md
+
+The line above is an IMPORT, not a link: Claude Code reads `CLAUDE.md` and
+follows `@path` references, so the policy is actually loaded rather than merely
+pointed at. A Markdown link is a link — Claude does not open it. `AGENTS.md`
+stays canonical; only Claude-specific differences belong below.
 
 Claude-specific notes:
 

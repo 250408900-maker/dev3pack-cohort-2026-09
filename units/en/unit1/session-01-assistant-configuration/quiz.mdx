@@ -35,7 +35,7 @@
 <Question
   choices={[
     { text: "In the assistant's summary at the end of the task", explain: "A summary is a claim. AGENTS.md says never claim a command ran unless it ran." },
-    { text: "In the Commands section of the policy file, as the exact command you also run", explain: "Correct. uv run pytest -q decides done. The assistant proposes, the command decides, you approve.", correct: true },
+    { text: "In the Commands section of the policy file, as the exact command you also run", explain: "Correct. The command decides done, not the assistant's summary — here `uv run bootcamp check ch01`. The assistant proposes, the command decides, you approve.", correct: true },
     { text: "In a comment at the top of the changed file", explain: "A comment is not executed. The check has to run." },
   ]}
 />

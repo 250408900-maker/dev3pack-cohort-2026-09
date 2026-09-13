@@ -18,7 +18,7 @@ and the capstone you build over three weeks.
 |---|---|
 | Input | A repository, an assistant that reads project files (Claude Code, Cursor, or another), and one small feature: an optional `tags` filter on `search_documents`, worked in a scratch copy. |
 | Output | Scoped project instructions with their acceptance checks written in, and a task-loop record: the plan you approved, the diff you inspected, one rejected change with its reason, and the remaining risks. |
-| Budget | One feature. One file, `src/bootcamp_agent/tools.py`, plus its test. No new dependency. `uv run pytest -q` and `uv run ruff check .` decide "done". |
+| Budget | One feature. One file, `src/bootcamp_agent/tools.py`. No new dependency. `uv run bootcamp check ch01` and `uv run ruff check .` decide "done" — `tests/` is not in your copy, so the check is your suite. |
 | Failures this session must handle | **An ambiguous instruction.** The assistant asks, or it guesses and you catch the guess. Either way the missing sentence lands in `AGENTS.md`. **An unauthorized file change.** You ask for an edit outside the allowed files. The assistant refuses, or it produces a diff and you reject it. |
 
 The threat is not a hostile model. It is a helpful one with no boundary: it

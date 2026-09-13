@@ -214,22 +214,30 @@ def inline(text: str) -> str:
     return "".join(out)
 
 
-def render_question(question: Question) -> str:
-    """One question as HTML that needs no JavaScript to work.
+def render_question(question: Question, number: int = 0) -> str:
+    """One question: pick an answer, and the reason appears under it.
 
-    Each choice opens to its own explanation, and the tick appears only inside
-    an opened one -- never in the summary, which would answer the question
-    before it was asked, and never behind `opacity:0`, which still reads the
-    answer out to a screen reader.
+    A RADIO INPUT AND `:checked`, NOT JAVASCRIPT. The same markup is shown in a
+    notebook, and a `<script>` inserted through `innerHTML` never executes — in
+    any browser, not as a Jupyter policy. Form controls and CSS both work there,
+    so choosing an answer can reveal its explanation with no script at all, and
+    the radio group makes the choices exclusive for free.
+
+    The explanation is in the DOM either way; these quizzes are ungraded
+    self-checks and the graded assessment lives behind an API. What the markup
+    controls is only whether a reader SEES the answer before they commit.
     """
     rows = []
-    for choice in question.choices:
-        tick = '<span class="tick">✓ </span>' if choice.correct else ""
+    for position, choice in enumerate(question.choices):
+        cid = f"q{number}c{position}"
+        state = "right" if choice.correct else "wrong"
         rows.append(
-            '<li class="choice"><details><summary>'
-            f"{inline(choice.text)}</summary>"
-            f'<p class="explain">{tick}{inline(choice.explain)}</p>'
-            "</details></li>"
+            f'<li class="choice {state}">'
+            f'<input type="radio" name="q{number}" id="{cid}">'
+            f'<label for="{cid}"><span class="box"></span>'
+            f'<span class="text">{inline(choice.text)}</span></label>'
+            f'<p class="explain">{inline(choice.explain)}</p>'
+            "</li>"
         )
     return f'<div class="question"><ul class="choices">{"".join(rows)}</ul></div>'
 
@@ -290,7 +298,7 @@ def render(source: Path) -> Page:
     body = _markdown().render("\n".join(lines))  # type: ignore[attr-defined]
     for number, question in enumerate(questions):
         marker = f"{PLACEHOLDER}{number}"
-        rendered = render_question(question)
+        rendered = render_question(question, number)
         body = body.replace(f"<p>{marker}</p>", rendered).replace(marker, rendered)
 
     title = next((shown for level, shown, _ in headings if level == 1), source.stem)
@@ -432,22 +440,29 @@ def find(slug: str) -> Entry:
 
 #: Inlined, because a notebook output has no stylesheet to link to.
 NOTEBOOK_STYLE = """<style>
-.dev3pack{line-height:1.6;max-width:52em}
-.dev3pack .question{margin:1em 0 1.4em}
+.dev3pack{line-height:1.65;max-width:52em}
+.dev3pack .question{margin:1.2em 0 1.6em}
 .dev3pack .choices{list-style:none;margin:0;padding:0}
 .dev3pack .choice{margin:6px 0}
-.dev3pack summary{cursor:pointer;padding:9px 12px;border:1px solid #d8d8de;
-border-radius:8px;list-style:none}
-.dev3pack summary::-webkit-details-marker{display:none}
-.dev3pack summary:hover{border-color:#2f6f4f}
-.dev3pack .explain{margin:6px 0 0;padding:8px 12px;font-size:.94em;opacity:.85;
-border-left:2px solid #d8d8de}
-.dev3pack .tick{color:#1d7a4c;font-weight:700}
+.dev3pack .choice input{position:absolute;opacity:0;width:0;height:0}
+.dev3pack .choice label{display:flex;gap:.7em;align-items:flex-start;cursor:pointer;
+padding:9px 12px;border:1px solid rgba(127,127,127,.28);border-radius:9px}
+.dev3pack .choice label:hover{border-color:#3b6ef6}
+.dev3pack .choice .box{flex:0 0 auto;width:15px;height:15px;margin-top:.18em;
+border:1.5px solid rgba(127,127,127,.55);border-radius:4px}
+.dev3pack .choice input:checked+label{border-color:#3b6ef6}
+.dev3pack .choice input:checked+label .box{background:#3b6ef6;border-color:#3b6ef6}
+.dev3pack .choice.right input:checked+label{border-color:#1d9a63}
+.dev3pack .choice.right input:checked+label .box{background:#1d9a63;border-color:#1d9a63}
+.dev3pack .choice .explain{display:none;margin:6px 0 0 2.3em;padding:8px 12px;
+font-size:.94em;opacity:.85;border-left:2px solid rgba(127,127,127,.3)}
+.dev3pack .choice input:checked~.explain{display:block}
+.dev3pack .choice.right input:checked~.explain{border-left-color:#1d9a63}
 .dev3pack code{background:rgba(127,127,127,.14);padding:.12em .35em;border-radius:4px}
 .dev3pack pre{background:rgba(127,127,127,.1);padding:12px;border-radius:8px;overflow-x:auto}
 .dev3pack pre code{background:none;padding:0}
 .dev3pack table{border-collapse:collapse}
-.dev3pack th,.dev3pack td{border:1px solid #d8d8de;padding:6px 9px;text-align:left}
+.dev3pack th,.dev3pack td{border:1px solid rgba(127,127,127,.3);padding:6px 9px;text-align:left}
 </style>"""
 
 

@@ -28,10 +28,14 @@ An instruction the assistant cannot verify is a wish. The **Commands** section
 is where the acceptance checks live, and they are the same commands you run:
 
 ```bash
-uv run pytest -q          # the suite decides "done", not the assistant's summary
-uv run ruff check .       # style is a check, not a request
+uv run bootcamp check ch01   # the check decides "done", not the assistant's summary
+uv run ruff check .          # style is a check, not a request
 uv run ruff format .
 ```
+
+Our own suite runs `pytest` too, but `tests/` is not in your copy — it holds the
+solved value of every exercise. The principle is the same and so is the sentence
+in the policy file: name the command that decides, and make it one you run.
 
 `CLAUDE.md` adds the review step for this repository: present the plan, wait
 for approval, then edit. `AGENTS.md` adds the reporting rule: never claim a
