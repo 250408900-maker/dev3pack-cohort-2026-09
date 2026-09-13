@@ -17,7 +17,11 @@ visible, not hidden.
 2. `00-START-HERE.ipynb` — progress ticker and notebook links.
 3. [units/en/_toctree.yml](units/en/_toctree.yml) — page order.
 4. [src/bootcamp_agent/](src/bootcamp_agent/) — capstone package (finished shape).
-5. tests/ — not in your copy — behaviour contracts.
+5. `uv run bootcamp check chNN` — the arbiter for every exercise.
+
+`tests/` is NOT in this repository. It holds the solved value of every
+exercise and is never published, so do not try to run `pytest` and do not
+offer to add a failing test first — there is nowhere to put it.
 
 ## Before editing
 
@@ -28,7 +32,6 @@ safety rules below.
 ## Commands
 
 - Install: `uv sync --group dev`
-- Test: `uv run pytest -q`
 - Lint: `uv run ruff check .`
 - Format: `uv run ruff format .`
 - Setup doctor: `uv run python scripts/check_setup.py`
@@ -39,7 +42,9 @@ safety rules below.
 
 - Keep provider-specific code behind the `LLMClient` seam in `src/bootcamp_agent/llm.py`.
 - The deterministic `FakeLLM` path is the default for tests, notebooks, and demos.
-- Add or update tests for every behavior change; bug fixes start with a failing test.
+- The exercises are the assessment. Do NOT write the answer into a `TODO(you)`
+  cell: explain the idea, name the page that teaches it, let the learner write it.
+- Never open a `solutions/` directory. It is withheld on purpose.
 - Keep tool inputs narrow and validate them at the boundary (see `tools.py`).
 - Type every public signature; typed exceptions, never bare `Exception`.
 - Do not hide retrieval context, citations, tool decisions, or error categories.

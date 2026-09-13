@@ -118,6 +118,7 @@ Where everything lives, and what a student receives.
 | `AGENTS.md` | The policy a coding assistant reads before it edits. `CLAUDE.md` and the Cursor rules point at it rather than forking it. | day one |
 | `README.md` | This file. | day one |
 | `SETUP.md` | The half-hour path from a clone to a green doctor. | day one |
+| `llms.txt` | What an agent helping you needs — and what it must not do. Generated. | day one |
 | `CLAUDE.md` | Points Claude Code at `AGENTS.md`. | day one |
 | `LICENSE` | MIT. | day one |
 | `pyproject.toml` | The package, its dependency groups, and the tool configuration. | day one |
@@ -156,7 +157,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (38 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (39 paths). |
 | Week 1 | Mon 14 Sep | unit1 |
 | Week 2 | Mon 21 Sep | unit2 |
 | Week 3 | Mon 28 Sep | unit3 |

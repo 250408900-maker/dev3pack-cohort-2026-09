@@ -114,6 +114,9 @@ ALWAYS = (
     "final_assignment",
     "README.md",
     "SETUP.md",
+    # The agent-facing index. Re-derived against the student's own tree after
+    # withdrawal by `rewrite_llms`, so it never names a session they lack.
+    "llms.txt",
     "LICENSE",
     # The assistant policy, and the two files that point at it rather than
     # forking it. The README a student receives has a whole section telling them
@@ -400,7 +403,25 @@ def build(
     _prune_unreleased_solutions(destination, released_solutions)
     trim_toctree(destination, week)
     annotate_missing_links(destination, week)
+    rewrite_llms(destination)
     return copied, skipped
+
+
+def rewrite_llms(destination: Path) -> None:
+    """Re-derive `llms.txt` against the tree the student actually receives.
+
+    It is generated in the source repository, where every session exists, so the
+    copy that lands here would link all fifteen — ten of them to pages this
+    checkout does not contain. An agent reading it would go looking for them.
+    Same reason `trim_toctree` runs directly above.
+    """
+    target = destination / "llms.txt"
+    if not target.is_file():
+        return
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from course_site import render_llms
+
+    target.write_text(render_llms(destination / UNITS), encoding="utf-8")
 
 
 def read_manifest(destination: Path) -> set[str] | None:

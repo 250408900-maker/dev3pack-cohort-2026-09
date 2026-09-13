@@ -66,12 +66,19 @@ cp .env.example .env
 (pytest, ruff, notebook tooling). You never activate the venv by hand — always
 prefix commands with `uv run`.
 
-## 5. Run the tests and the doctor
+## 5. Run the doctor
 
 ```bash
-uv run pytest -q
-uv run python scripts/check_setup.py
+uv run bootcamp doctor
 ```
+
+It checks Python, the kernel, the teaching corpus and the offline model lane,
+and tells you what to run for anything missing. A green doctor is the whole bar
+for starting.
+
+(There is no `pytest` step here. The test suite is ours, not yours -- it holds
+the solved value of every exercise, so it is not in your copy. Running it finds
+nothing and says so in a way that reads like a broken install.)
 
 Everything green (⚠️ warnings are fine)? **Screenshot the doctor output and post
 it in the cohort channel.** That's your ticket for day 1.
@@ -140,7 +147,7 @@ git push mine main
 | Corporate proxy blocks installs | `export UV_HTTP_TIMEOUT=120` and configure `HTTPS_PROXY`; worst case use a personal network for setup |
 | `python` is 3.9/3.10 | Irrelevant — `uv run` uses the project's own 3.11; don't fight the system Python |
 | Windows: `ExecutionPolicy` error | Run PowerShell as administrator once for the installer, or use WSL2 (recommended) |
-| `pytest` not found | You ran it bare — always `uv run pytest` |
+| A command is not found | You ran it bare — everything is prefixed `uv run` |
 | Doctor says corpus missing | You're not in the repo root — `cd` into the cloned folder |
 | `Permission denied (publickey)` or `Repository not found` when cloning | You have not accepted the invitation yet, or you accepted it with a different GitHub account. Check <https://github.com/notifications>, then step 3 above |
 | `git pull` says `Permission denied` | Same cause. Read access is per-account, and SSH keys are per-machine — add this machine's key at <https://github.com/settings/keys>, or clone over HTTPS |

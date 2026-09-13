@@ -74,6 +74,7 @@ integrations/hermes-telegram/check_hermes.py
 integrations/sendai-txs/.gitignore
 integrations/sendai-txs/index.ts
 integrations/sendai-txs/package.json
+llms.txt
 modules/README.md
 pyproject.toml
 scripts/check_notebooks.py
