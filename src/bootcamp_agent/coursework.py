@@ -109,6 +109,30 @@ def run_chapter(chapter: Chapter, timeout: int = 180) -> Scorecard:
     )
 
 
+def stored_scorecard(notebook_path: Path, identifier: str, expected: tuple[str, ...]) -> Scorecard:
+    """What a notebook's SAVED outputs report, without executing anything.
+
+    For the two assistant-driven sessions the course deliberately does not
+    re-run the notebook — running them unattended would score zero for work that
+    was genuinely done. That is a reason not to re-run it, never a reason to
+    claim it never ran: the learner's own `✅ chNN-eN passed` is sitting in the
+    file, and reading it is the whole of "as it stands".
+
+    A notebook that was never executed reports nothing passed, which is correct
+    and is what an unfinished hand-in should say.
+    """
+    try:
+        import nbformat
+    except ImportError as error:
+        raise CourseworkError(
+            f"{error.name} is missing; install the dev group: uv sync --group dev"
+        ) from error
+    if not notebook_path.is_file():
+        raise CourseworkError(f"not found: {notebook_path}")
+    notebook = nbformat.read(notebook_path, as_version=4)
+    return read_scorecard(identifier, outputs_of(notebook), expected)
+
+
 def run_notebook(
     notebook_path: Path,
     expected: tuple[str, ...],

@@ -39,6 +39,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from bootcamp_agent.read import (  # noqa: E402
     Entry,
+    Group,
     Page,
     ReadError,
     render,
@@ -81,6 +82,11 @@ font-size:9px;transition:transform .12s}
 nav.side details.group[open]>summary::before{transform:rotate(90deg)}
 nav.side details.group>summary:hover{color:var(--accent)}
 nav.side details.group>a.page{margin-left:1em}
+nav.side details.group.d1>summary{text-transform:none;letter-spacing:0;font-size:12.5px;
+margin:9px 0 4px 0.7em}
+nav.side details.group.d1>a.page{margin-left:1.8em}
+nav.side details.group.d2>summary{margin-left:1.4em}
+nav.side details.group.d2>a.page{margin-left:2.5em}
 nav.side a.page{display:block;padding:5px 9px;border-radius:6px;color:var(--fg);
 text-decoration:none;font-size:14px}
 nav.side a.page:hover{background:var(--line)}
@@ -145,32 +151,39 @@ def _depth(local: str) -> str:
     return "../" * local.count("/")
 
 
-def _sidebar(groups: list[tuple[str, list[Entry]]], here: str) -> str:
-    """The contents, one collapsible group per unit, the current one open.
+def _group_html(group: Group, here: str, up: str, depth: int) -> str:
+    """One unit, its pages, and the units under it — open only on the path.
 
-    Thirty groups listed flat is a wall nobody reads past; collapsed, the whole
-    course is a screen and a reader opens the week they are in. `<details>`
-    again, for the same reason the quiz uses it: no JavaScript, so it works with
-    the script blocked and renders the same everywhere.
+    A session's pages are a level deeper than the session, which is a level
+    deeper than its unit, so a shut sidebar is four units and a reader opens the
+    week they are in. `<details>` throughout: no JavaScript, so it works with
+    the script blocked and reads the same everywhere.
     """
+    # Open every group on the path to the current page, and nothing else — so
+    # the unit, the session inside it and that session's pages are all visible
+    # at once, while the other fourteen sessions stay shut.
+    on_path = any(entry.local == here for entry in group.walk())
+    rows = [
+        f'<details class="group d{min(depth, 2)}"{" open" if on_path else ""}>',
+        f"<summary>{html.escape(group.title)}</summary>",
+    ]
+    for entry in group.entries:
+        current = ' aria-current="page"' if entry.local == here else ""
+        rows.append(
+            f'<a class="page" href="{up}{entry.local}.html"{current}>{html.escape(entry.title)}</a>'
+        )
+    for child in group.groups:
+        rows.append(_group_html(child, here, up, depth + 1))
+    rows.append("</details>")
+    return "\n".join(rows)
+
+
+def _sidebar(groups: list[Group], here: str) -> str:
     up = _depth(here)
     out = [f'<h1><a href="{up}index.html">Dev3Pack AI-Engineering Bootcamp</a></h1>']
-    for title, entries in groups:
-        if not entries:
-            continue
-        # Open the group holding the page being read, and nothing else. On the
-        # index redirect nothing matches, so the reader lands on a closed list
-        # and sees the shape of the course before any one page of it.
-        current_group = any(entry.local == here for entry in entries)
-        out.append(f'<details class="group"{" open" if current_group else ""}>')
-        out.append(f"<summary>{html.escape(title)}</summary>")
-        for entry in entries:
-            current = ' aria-current="page"' if entry.local == here else ""
-            out.append(
-                f'<a class="page" href="{up}{entry.local}.html"{current}>'
-                f"{html.escape(entry.title)}</a>"
-            )
-        out.append("</details>")
+    for group in groups:
+        if group.walk():
+            out.append(_group_html(group, here, up, 0))
     return "\n".join(out)
 
 
@@ -226,10 +239,121 @@ def shell(page: Page, entry: Entry, sidebar: str, pager: str) -> str:
 # --------------------------------------------------------------------------
 
 
+LANDING_STYLE = """
+.landing{max-width:860px;margin:0 auto;padding:56px 24px 90px}
+.landing h1{font-size:2.2rem;margin:0 0 .35em;line-height:1.15}
+.landing .lede{font-size:1.12rem;color:var(--muted);margin:0 0 1.6em}
+.landing .cta{display:inline-block;padding:11px 20px;border-radius:9px;
+background:var(--accent);color:var(--bg);text-decoration:none;font-weight:600}
+.landing .cta:hover{opacity:.9}
+.landing .meta{margin:1.6em 0 0;color:var(--muted);font-size:.94rem}
+.units{display:grid;gap:14px;margin:3em 0 0}
+.unit{border:1px solid var(--line);border-radius:11px;padding:16px 18px}
+.unit h2{font-size:1.02rem;margin:0 0 .15em;border:0;padding:0}
+.unit p{margin:.2em 0 .7em;color:var(--muted);font-size:.93rem}
+.unit ol{margin:0;padding-left:1.15em;font-size:.93rem}
+.unit li{margin:.22em 0}
+.unit li.pending{color:var(--muted)}
+.unit li .when{color:var(--muted);font-size:.88em}
+.landing footer{margin-top:3.4em;padding-top:1.3em;border-top:1px solid var(--line);
+font-size:.9rem;color:var(--muted)}
+.landing footer a{margin-right:1.1em}
+"""
+
+
+def _landing(published: set[str]) -> str:
+    """The front door: what this is, when it runs, and where to start.
+
+    It replaced a `<meta http-equiv=refresh>` stub that bounced straight into
+    unit 0 -- which works, and tells a visitor nothing about what they have
+    opened or what is in it.
+
+    WHAT IS PUBLISHED IS READ FROM DISK, never from the calendar. A session
+    whose week has not shipped has no page to link to, so it is listed with its
+    date and no link. That keeps this honest in the cohort repository, where
+    later weeks genuinely are not there yet.
+    """
+    from bootcamp_agent.curriculum import CHAPTERS, WEEK_TITLES
+
+    def link(local: str, text: str) -> str:
+        safe = html.escape(text)
+        return f'<a href="{local}.html">{safe}</a>' if local in published else safe
+
+    blocks = []
+    unit0 = [
+        ("unit0/introduction", "Welcome"),
+        ("unit0/onboarding", "Onboarding"),
+        ("unit0/runtime-lanes", "Runtime lanes"),
+        ("unit0/how-to-submit", "Handing work in"),
+        ("unit0/week0", "Week 0 — the prerequisite"),
+    ]
+    items = "".join(f"<li>{link(local, text)}</li>" for local, text in unit0)
+    blocks.append(
+        '<section class="unit"><h2>Unit 0 — before we start</h2>'
+        "<p>Self-paced, unmarked, and the reason week 1 does not begin with an "
+        "install problem.</p>"
+        f"<ol>{items}</ol></section>"
+    )
+
+    for week in sorted(WEEK_TITLES):
+        rows = []
+        for chapter in CHAPTERS:
+            if chapter.module != week:
+                continue
+            local = f"{chapter.directory.parent.name}/{chapter.directory.name}/introduction"
+            shown = f"Session {chapter.number}. {chapter.title}"
+            if local in published:
+                rows.append(
+                    f"<li>{link(local, shown)} "
+                    f'<span class="when">— {html.escape(chapter.weekday)}</span></li>'
+                )
+            else:
+                rows.append(
+                    f'<li class="pending">{html.escape(shown)} '
+                    f'<span class="when">— arrives {html.escape(chapter.weekday)}</span></li>'
+                )
+        blocks.append(
+            f'<section class="unit"><h2>Unit {week} — {html.escape(WEEK_TITLES[week])}</h2>'
+            f"<ol>{''.join(rows)}</ol></section>"
+        )
+
+    start = "unit0/introduction" if "unit0/introduction" in published else None
+    cta = (
+        f'<a class="cta" href="{start}.html">Start here</a>'
+        if start
+        else "<em>Nothing is published yet.</em>"
+    )
+    return f"""<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dev3Pack AI-Engineering Bootcamp</title>
+<meta name="description" content="Three weeks, fifteen sessions, one source-grounded
+research assistant you can test, cite and defend.">
+<link rel="stylesheet" href="style.css">
+<style>{LANDING_STYLE}</style>
+</head><body>
+<main class="landing">
+<h1>Dev3Pack AI-Engineering Bootcamp</h1>
+<p class="lede">Three weeks. Fifteen sessions. One source-grounded research
+assistant you can test, cite, and defend.</p>
+{cta}
+<p class="meta">14 September – 2 October 2026 · Monday to Friday, two hours a day ·
+every scored notebook runs offline, no API key required.</p>
+<div class="units">{"".join(blocks)}</div>
+<footer>
+<a href="https://github.com/Gecko-Academy/dev3pack-cohort-2026-09">The repository</a>
+<a href="https://github.com/Gecko-Academy/dev3pack-submissions">Hand work in</a>
+</footer>
+</main>
+</body></html>
+"""
+
+
 def build(out: Path = OUT) -> tuple[int, list[str]]:
     """Write the whole site. Returns how many pages, and what was missing."""
     groups = toctree()
-    flat = [entry for _, entries in groups for entry in entries]
+    flat = [entry for group in groups for entry in group.walk()]
     missing = [entry.local for entry in flat if not entry.source.is_file()]
     present = [entry for entry in flat if entry.source.is_file()]
 
@@ -242,7 +366,14 @@ def build(out: Path = OUT) -> tuple[int, list[str]]:
 
     # Only pages that exist go in the sidebar: a week that has not been
     # published yet has no file, and a link to it would 404 rather than teach.
-    shown = [(title, [e for e in entries if e.source.is_file()]) for title, entries in groups]
+    def prune(group: Group) -> Group:
+        return Group(
+            title=group.title,
+            entries=tuple(e for e in group.entries if e.source.is_file()),
+            groups=tuple(prune(child) for child in group.groups),
+        )
+
+    shown = [prune(group) for group in groups]
 
     for position, entry in enumerate(present):
         page = render(entry.source)
@@ -254,12 +385,8 @@ def build(out: Path = OUT) -> tuple[int, list[str]]:
         )
 
     if present:
-        first = present[0]
         (out / "index.html").write_text(
-            f'<!doctype html><meta charset="utf-8">'
-            f'<meta http-equiv="refresh" content="0;url={first.local}.html">'
-            f'<a href="{first.local}.html">Start the course</a>',
-            encoding="utf-8",
+            _landing({entry.local for entry in present}), encoding="utf-8"
         )
     (out / "pages.json").write_text(
         json.dumps([{"local": e.local, "title": e.title} for e in present], indent=2),

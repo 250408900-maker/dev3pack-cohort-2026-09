@@ -155,7 +155,10 @@ def _progress() -> int:
     and an assistant-driven session cannot be run here at all.
     """
     from bootcamp_agent import submission
-    from bootcamp_agent.coursework import CourseworkError, run_notebook
+    from bootcamp_agent.coursework import (
+        CourseworkError,
+        run_notebook,
+    )
     from bootcamp_agent.curriculum import CAPSTONE, CHAPTERS, WEEK0_UNITS
 
     rows: list[tuple[str, str, str | None]] = []
@@ -173,12 +176,16 @@ def _progress() -> int:
         except submission.SubmissionError:
             print(f"{label} demo day")
             continue
-        if not item.verifiable:
-            print(f"{label} in Jupyter")
-            continue
+        # ARRIVAL IS ASKED FIRST. "In Jupyter" is advice about how to run a
+        # session, and it is wrong before that session exists: `ch10 … in
+        # Jupyter` invited a student to open a file their clone did not have,
+        # while every other unpublished session correctly said when it arrives.
         pending = _arrival(item.notebook, when)
         if pending is not None:
             print(f"{label} {pending}")
+            continue
+        if not item.verifiable:
+            print(f"{label} in Jupyter")
             continue
         try:
             card = run_notebook(item.notebook, item.exercises, item.id)
@@ -218,7 +225,11 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
     from pathlib import Path
 
     from bootcamp_agent import submission
-    from bootcamp_agent.coursework import CourseworkError, run_notebook
+    from bootcamp_agent.coursework import (
+        CourseworkError,
+        run_notebook,
+        stored_scorecard,
+    )
 
     try:
         item = submission.resolve(chapter_id)
@@ -234,7 +245,12 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
         # `manual_reason` in the curriculum, never from a list written here.
         print(f"{item.id} ({item.title}) — {item.note}")
         print("submitting your notebook as it stands, with no re-run and no marks.")
-        card = None
+        # "As it stands" means what the notebook SAYS. Handing in `None` here
+        # filled `not_reached` with every exercise and claimed `ran: false`, so
+        # a learner whose notebook plainly showed `✅ ch01-e1 passed` was told it
+        # never ran — on day one, having done the work. Read the outputs they
+        # left instead; we are declining to RE-run it, not pretending it never ran.
+        card = stored_scorecard(item.notebook, item.id, item.exercises)
     else:
         print(f"running {item.id} ({item.title})…")
         try:

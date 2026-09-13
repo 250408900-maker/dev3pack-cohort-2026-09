@@ -315,7 +315,53 @@ class Entry:
         return UNITS_ROOT / f"{self.local}.mdx"
 
 
-def toctree() -> list[tuple[str, list[Entry]]]:
+@dataclass(frozen=True)
+class Group:
+    """A unit in the contents: its own pages, then the groups beneath it.
+
+    NESTED, BECAUSE THE COURSE IS. A session belongs to a unit, and a flat list
+    of thirty groups made a reader work that out from the numbering. Hugging
+    Face's own `_toctree.yml` allows a section to carry `sections` of its own,
+    so this stays the same file format it always was.
+    """
+
+    title: str
+    entries: tuple[Entry, ...] = ()
+    groups: tuple[Group, ...] = ()
+
+    def walk(self) -> list[Entry]:
+        """Every page under here, depth first, in course order."""
+        found = list(self.entries)
+        for group in self.groups:
+            found += group.walk()
+        return found
+
+
+def _group_from(payload: dict, title: str) -> Group:
+    """One `{title, sections: [...]}` node, whose sections may be either kind.
+
+    A section is a PAGE when it names a `local`, and a SUB-GROUP when it carries
+    `sections` of its own. Both appear in the same list, in order, which is how
+    unit 0 keeps its own welcome pages above its four courses.
+    """
+    pages: list[Entry] = []
+    children: list[Group] = []
+    for section in payload.get("sections") or []:
+        if "local" in section:
+            pages.append(
+                Entry(
+                    local=str(section["local"]),
+                    title=str(section.get("title", "")),
+                    group=title,
+                )
+            )
+        elif "sections" in section:
+            child_title = str(section.get("title", ""))
+            children.append(_group_from(section, child_title))
+    return Group(title=title, entries=tuple(pages), groups=tuple(children))
+
+
+def toctree() -> list[Group]:
     """The course order, exactly as `_toctree.yml` gives it.
 
     THE TOCTREE IS THE ONLY ORDERING SOURCE. It is generated from the curriculum
@@ -329,25 +375,12 @@ def toctree() -> list[tuple[str, list[Entry]]]:
     if not TOCTREE.is_file():
         raise ReadError(f"{TOCTREE} is missing; run scripts/course_site.py first")
     payload = yaml.safe_load(TOCTREE.read_text(encoding="utf-8"))
-    groups: list[tuple[str, list[Entry]]] = []
-    for group in payload:
-        title = str(group.get("title", ""))
-        groups.append(
-            (
-                title,
-                [
-                    Entry(local=str(s["local"]), title=str(s.get("title", "")), group=title)
-                    for s in group.get("sections", [])
-                    if "local" in s
-                ],
-            )
-        )
-    return groups
+    return [_group_from(node, str(node.get("title", ""))) for node in payload]
 
 
 def entries() -> list[Entry]:
     """Every page, flat, in course order."""
-    return [entry for _, group in toctree() for entry in group]
+    return [entry for group in toctree() for entry in group.walk()]
 
 
 def _matches(local: str, wanted: list[str]) -> bool:
@@ -438,16 +471,26 @@ def page(slug: str) -> object:
 
 def contents() -> object:
     """Show every page there is, grouped, as links a notebook can list."""
-    blocks = []
-    for title, group in toctree():
-        available = [entry for entry in group if entry.source.is_file()]
-        if not available:
-            continue
-        items = "".join(
-            f"<li><code>{html.escape(entry.local)}</code> — {html.escape(entry.title)}</li>"
-            for entry in available
-        )
-        blocks.append(f"<p><strong>{html.escape(title)}</strong></p><ul>{items}</ul>")
+    blocks: list[str] = []
+
+    def render(group: Group, depth: int) -> None:
+        available = [entry for entry in group.entries if entry.source.is_file()]
+        if available or any(child.walk() for child in group.groups):
+            indent = depth * 18
+            blocks.append(
+                f'<p style="margin-left:{indent}px"><strong>{html.escape(group.title)}</strong></p>'
+            )
+        if available:
+            items = "".join(
+                f"<li><code>{html.escape(entry.local)}</code> — {html.escape(entry.title)}</li>"
+                for entry in available
+            )
+            blocks.append(f'<ul style="margin-left:{depth * 18}px">{items}</ul>')
+        for child in group.groups:
+            render(child, depth + 1)
+
+    for group in toctree():
+        render(group, 0)
     body = "".join(blocks) or "<p>No pages are published yet.</p>"
     try:
         from IPython.display import HTML

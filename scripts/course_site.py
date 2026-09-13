@@ -216,92 +216,128 @@ def _sections(directory: Path, first_title: str | None = None) -> list[dict[str,
 
 
 def groups() -> list[dict[str, object]]:
-    """The table of contents as data. Group order is the course order."""
+    """The table of contents as data, NESTED: a unit, then its sessions.
+
+    The course is a hierarchy — a session belongs to a unit — and a flat list of
+    thirty groups made a reader infer that from the numbering. Hugging Face's
+    own `_toctree.yml` lets a section carry `sections` of its own, so this is
+    the same file format it always was, one level deeper.
+
+    Unit 0 keeps its welcome pages directly, with the four prerequisite courses
+    beneath it; units 1 to 3 hold nothing but their sessions.
+    """
     out: list[dict[str, object]] = []
 
+    unit0_children: list[dict[str, object]] = []
     unit0 = UNITS_ROOT / UNIT0
+    own: list[dict[str, str]] = []
     if unit0.is_dir():
-        ordered = [
-            unit0 / f"{stem}.mdx" for stem in UNIT0_ORDER if (unit0 / f"{stem}.mdx").is_file()
+        own = [
+            {"local": _local(page), "title": page_title(page)}
+            for stem in UNIT0_ORDER
+            if (page := unit0 / f"{stem}.mdx").is_file()
         ]
-        out.append(
-            {
-                "title": "Unit 0. Welcome to the course",
-                "sections": [
-                    {"local": _local(page), "title": page_title(page)} for page in ordered
-                ],
-            }
-        )
 
-    # WHY "TOPIC" AND NOT "UNIT" HERE. The prerequisite material was numbered
-    # `Unit 1 … Unit 12` while the three teaching weeks are also `unit1 … unit3`
-    # on disk and in every path, so the sidebar carried two different "Unit 1"
-    # and a reader had no way to tell which one anybody meant. The weeks keep
-    # the word; the prerequisite items are topics, and all of it is Unit 0,
-    # because "Week 0" was a third name for the same material.
+    # "Topic", not "Unit": the prerequisite material was numbered Unit 1 … Unit
+    # 12 while the teaching weeks are unit1 … unit3 on disk, so the word meant
+    # two things at once.
     for course in WEEK0_COURSES:
         sections: list[dict[str, str]] = []
         for unit in WEEK0_UNITS:
             if unit.course == course:
                 sections += _sections(unit.directory, f"Topic {unit.number}. {unit.title}")
-        out.append({"title": f"Unit 0 · {course}", "sections": sections})
+        if sections:
+            unit0_children.append({"title": course, "sections": sections})
 
-    for chapter in CHAPTERS:
-        # `Unit <week>.<n>` names where a session sits, the way Hugging Face
-        # writes Unit 2.1, 2.2, 2.3 — so a collapsed sidebar still says which
-        # week a session belongs to.
-        nth = [c for c in CHAPTERS if c.module == chapter.module].index(chapter) + 1
-        out.append(
-            {
-                "title": (
-                    f"Unit {chapter.module}.{nth} · Session {chapter.number}. "
-                    f"{chapter.title} — {chapter.weekday}"
-                ),
-                "sections": _sections(chapter.directory, "Introduction"),
-            }
-        )
-        # The capstone opens with a week, so it belongs after that week's last
-        # session rather than after all fifteen.
-        last_of_week = [c for c in CHAPTERS if c.module == chapter.module][-1]
-        if chapter is last_of_week and chapter.module == CAPSTONE.opens_in_week:
-            out.append(
+    if own or unit0_children:
+        out.append({"title": "Unit 0. Welcome to the course", "sections": own + unit0_children})
+
+    for week in sorted({chapter.module for chapter in CHAPTERS}):
+        sessions: list[dict[str, object]] = []
+        for chapter in CHAPTERS:
+            if chapter.module != week:
+                continue
+            sessions.append(
                 {
-                    "title": f"Unit {CAPSTONE.opens_in_week} · {CAPSTONE.title}",
-                    "sections": _sections(CAPSTONE.directory, "Introduction"),
+                    "title": f"Session {chapter.number}. {chapter.title} — {chapter.weekday}",
+                    "sections": _sections(chapter.directory, "Introduction"),
                 }
             )
+            # The capstone opens with a week, so it sits inside that week rather
+            # than after all fifteen sessions.
+            last_of_week = [c for c in CHAPTERS if c.module == chapter.module][-1]
+            if chapter is last_of_week and chapter.module == CAPSTONE.opens_in_week:
+                sessions.append(
+                    {
+                        "title": CAPSTONE.title,
+                        "sections": _sections(CAPSTONE.directory, "Introduction"),
+                    }
+                )
+        if sessions:
+            out.append({"title": f"Unit {week}. {WEEK_TITLES[week]}", "sections": sessions})
 
     for name, title in TRAILING:
         directory = UNITS_ROOT / TRACKS_ROOT / name
         if directory.is_dir() and pages(directory):
             out.append({"title": title, "sections": _sections(directory)})
 
+    bonus: list[dict[str, object]] = []
     for index, name in enumerate(BONUS_DIRS, start=1):
         directory = UNITS_ROOT / name
         if directory.is_dir() and pages(directory):
-            out.append(
+            bonus.append(
                 {
-                    "title": (
-                        f"(Optional) Bonus {index}. {page_title(directory / 'introduction.mdx')}"
-                    ),
+                    "title": (f"Bonus {index}. {page_title(directory / 'introduction.mdx')}"),
                     "sections": _sections(directory),
                 }
             )
+    if bonus:
+        out.append({"title": "(Optional) Bonus units", "sections": bonus})
     return out
 
 
+def _toctree_lines(nodes: list, indent: str) -> list[str]:
+    """One level of the contents, recursing into any node that has its own.
+
+    A node is a PAGE when it names a `local` and a GROUP when it carries
+    `sections`. Both kinds sit in the same list, in order, which is how unit 0
+    keeps its welcome pages above the four prerequisite courses.
+    """
+    lines: list[str] = []
+    for node in nodes:
+        if "local" in node:
+            lines.append(f"{indent}- local: {node['local']}")
+            lines.append(f"{indent}  title: {json.dumps(node['title'], ensure_ascii=False)}")
+            continue
+        lines.append(f"{indent}- title: {json.dumps(node['title'], ensure_ascii=False)}")
+        lines.append(f"{indent}  sections:")
+        lines += _toctree_lines(node["sections"], indent + "  ")
+    return lines
+
+
 def render_toctree() -> str:
-    """Hand-rendered YAML: two nesting levels, quoted titles, no dependency."""
-    lines = [
-        "# generated by scripts/course_site.py — edit the curriculum or the pages, not this file"
-    ]
-    for group in groups():
-        lines.append(f"- title: {json.dumps(group['title'], ensure_ascii=False)}")
-        lines.append("  sections:")
-        for section in group["sections"]:  # type: ignore[union-attr]
-            lines.append(f"  - local: {section['local']}")
-            lines.append(f"    title: {json.dumps(section['title'], ensure_ascii=False)}")
-    return "\n".join(lines) + "\n"
+    """Hand-rendered YAML, nested to whatever depth the contents has."""
+    return (
+        "\n".join(
+            [
+                "# generated by scripts/course_site.py — edit the curriculum or "
+                "the pages, not this file",
+                *_toctree_lines(groups(), ""),
+            ]
+        )
+        + "\n"
+    )
+
+
+def walk_locals(nodes: list) -> list[str]:
+    """Every page the contents names, at any depth, in order."""
+    found: list[str] = []
+    for node in nodes:
+        if "local" in node:
+            found.append(node["local"])
+        else:
+            found += walk_locals(node["sections"])
+    return found
 
 
 def _link(directory: Path) -> str:
@@ -639,11 +675,7 @@ def validate() -> list[str]:
         for name in sorted(described - tracked):
             problems.append(f"{name}: described in REPO_MAP and not in the repository")
 
-    reachable = {
-        section["local"]
-        for group in groups()
-        for section in group["sections"]  # type: ignore[union-attr]
-    }
+    reachable = set(walk_locals(groups()))
     for page in sorted(UNITS_ROOT.rglob("*.mdx")):
         if page.name.startswith(("_", "loader-")) or "solutions" in page.parts:
             continue
