@@ -6,7 +6,10 @@ If logic starts creeping in here, it belongs in the package instead.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import os
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 
 from bootcamp_agent.agent import answer_question
@@ -163,10 +166,10 @@ def _progress() -> int:
 
     rows: list[tuple[str, str, str | None]] = []
     for unit in WEEK0_UNITS:
-        rows.append((unit.prefix, f"{unit.title[:44]:<44}", "week 0"))
+        rows.append((unit.prefix, _titled(unit.title), "week 0"))
     for chapter in CHAPTERS:
-        rows.append((chapter.chapter_id, f"{chapter.title[:44]:<44}", chapter.weekday))
-    rows.append((CAPSTONE.prefix, f"{CAPSTONE.title[:44]:<44}", "project"))
+        rows.append((chapter.chapter_id, _titled(chapter.title), chapter.weekday))
+    rows.append((CAPSTONE.prefix, _titled(CAPSTONE.title), "project"))
 
     worst = 0
     for item_id, title, when in rows:
@@ -188,7 +191,8 @@ def _progress() -> int:
             print(f"{label} in Jupyter")
             continue
         try:
-            card = run_notebook(item.notebook, item.exercises, item.id)
+            with _quiet_children():
+                card = run_notebook(item.notebook, item.exercises, item.id)
         except CourseworkError as error:
             print(f"{label} error: {str(error)[:40]}")
             worst = 1
@@ -198,6 +202,48 @@ def _progress() -> int:
         if card.failed or card.not_reached:
             worst = 1
     return worst
+
+
+#: Wide enough for the longest session title, minus an ellipsis. A title cut
+#: mid-word ran straight into the status — "…the repository i in Jupyter" reads
+#: as one broken sentence rather than a title and a state.
+_TITLE = 44
+
+
+def _titled(title: str) -> str:
+    """A title padded to a fixed width, and visibly cut when it does not fit."""
+    shown = title if len(title) <= _TITLE else title[: _TITLE - 1].rstrip() + "…"
+    return f"{shown:<{_TITLE}}"
+
+
+@contextlib.contextmanager
+def _quiet_children() -> Iterator[None]:
+    """Swallow what the notebooks' kernels write to the terminal.
+
+    `progress` runs every runnable chapter, and each one starts a kernel that
+    announces "Kernel is running over TCP without encryption … susceptible to
+    eavesdropping" — true, harmless, and printed about eighteen times above the
+    table it is meant to be showing. Unfinished week-0 exercises add their own:
+    unit 9 has the learner write `timezone_server.py`, so before they do, the
+    cell that launches it prints `can't open file …: No such file or directory`.
+
+    Both are expected output from work that has not been done yet, and neither
+    is a fault. Shown to somebody on their first day they read as a broken
+    install — which is exactly how a tester read them.
+
+    REDIRECTED AT THE FILE DESCRIPTOR, because the noise comes from child
+    processes: `contextlib.redirect_stderr` only moves Python's own `sys.stderr`
+    and a subprocess writes past it. `check` deliberately does NOT do this — one
+    chapter, being debugged, should show everything.
+    """
+    saved = os.dup(2)
+    try:
+        with open(os.devnull, "w") as null:
+            os.dup2(null.fileno(), 2)
+        yield
+    finally:
+        os.dup2(saved, 2)
+        os.close(saved)
 
 
 def _arrival(notebook: Path, when: str | None) -> str | None:

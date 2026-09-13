@@ -183,6 +183,11 @@ def retarget(notebook: Path) -> tuple[bool, str | None]:
             0,
             {
                 "cell_type": "markdown",
+                # nbformat 4.5 requires an id on every cell. Without one, every
+                # `bootcamp check`, `progress` and `submit` printed
+                # `MissingIDFieldWarning: … will become a hard error`, which is
+                # a frightening thing to show a learner for a badge.
+                "id": "colab-badge",
                 "metadata": {},
                 "source": wanted.splitlines(keepends=True),
             },
