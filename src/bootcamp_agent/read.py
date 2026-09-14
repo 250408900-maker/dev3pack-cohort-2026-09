@@ -273,6 +273,25 @@ def _markdown() -> object:
     return MarkdownIt("commonmark", {"html": True, "linkify": False}).enable("table")
 
 
+#: A relative link to another page, as an author writes it. The suffix is `.mdx`
+#: in the source because `course_site.py --check` resolves every link against
+#: the DISK -- a link that cannot be opened in the repository is a broken link,
+#: and that check has caught real ones. The site serves `.html`, so the suffix
+#: is rewritten here, at the moment the page becomes HTML. Absolute links and
+#: anything with a scheme are left exactly as written.
+_PAGE_LINK = re.compile(r'(href=")(?!\w+:|//|/)([^"#]+)\.mdx((?:#[^"]*)?")')
+
+
+def _as_pages(html: str) -> str:
+    """Point relative page links at the built page rather than its source.
+
+    Without this, every "Next:" footer and every cross-reference on the site is
+    a 404 -- the link resolves in the repository and nowhere else, which is the
+    most confusing kind of broken link because it works for whoever wrote it.
+    """
+    return _PAGE_LINK.sub(r"\1\2.html\3", html)
+
+
 def render(source: Path) -> Page:
     """One `.mdx` file as HTML, with its questions and its heading list."""
     if not source.is_file():
@@ -296,6 +315,7 @@ def render(source: Path) -> Page:
         lines.append(line)
 
     body = _markdown().render("\n".join(lines))  # type: ignore[attr-defined]
+    body = _as_pages(body)
     for number, question in enumerate(questions):
         marker = f"{PLACEHOLDER}{number}"
         rendered = render_question(question, number)
