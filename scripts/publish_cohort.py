@@ -745,7 +745,10 @@ def _stale(
         # A deny-listed file already in the destination. Refusing to publish is
         # not enough on its own: the audit would then refuse every publish
         # forever, and the file would sit there while it did.
-        denied = _forbidden(relative, week) is not None
+        # WITH the released set. Without it every solutions file reads as
+        # "not released yet" and is withdrawn moments after `build()` copied
+        # it -- a default argument quietly making one of four call sites wrong.
+        denied = _forbidden(relative, week, released_solutions) is not None
         if outside or withdrawn or denied:
             stale.append(relative)
     return stale
