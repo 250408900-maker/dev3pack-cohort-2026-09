@@ -35,7 +35,7 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import date
+from datetime import date, timedelta
 from fnmatch import fnmatch
 from pathlib import Path
 
@@ -54,6 +54,7 @@ from bootcamp_agent.curriculum import (  # noqa: E402
     CAPSTONE,
     CHAPTERS,
     TRACK_DIRS,
+    WEEK0_UNITS,
     get_chapter,
     unit_dir,
 )
@@ -763,6 +764,47 @@ def week_in_progress(today: date | None = None) -> int:
     return max(started, default=0)
 
 
+def solutions_due(today: date | None = None) -> set[str]:
+    """Solution directories the schedule has opened, as repo-relative paths.
+
+    THE RULE, AND IT IS ONE SENTENCE: a session's solutions appear when the NEXT
+    session opens. A full day to attempt it, then the answer -- and the deadline
+    pressure of the next class sits in between.
+
+    WHY PUBLISH THEM AT ALL. Secrecy is already gone and not because of this:
+    handing in is public, so the first merged submission puts a solved notebook
+    in a public repository. Withholding ours does not protect the answer, it
+    only means a stuck learner reads a peer's version, which may be wrong,
+    instead of the commented one. The controls that survive a copied answer are
+    the demo defence and the final's private question set, and neither depends
+    on hiding a notebook.
+
+    Week 0 is self-paced with nothing after it, so its units open together with
+    session 1 -- the point at which a learner who is stuck has a class to ask in.
+    """
+    day = today or date.today()
+    due: set[str] = set()
+
+    first_session = min(chapter.on for chapter in CHAPTERS)
+    if day >= first_session:
+        due |= {f"{UNITS}/{unit.unit}/{unit.dirname}/{SOLUTIONS}" for unit in WEEK0_UNITS}
+
+    ordered = sorted(CHAPTERS, key=lambda chapter: chapter.on)
+    for position, chapter in enumerate(ordered):
+        successor = ordered[position + 1] if position + 1 < len(ordered) else None
+        # The last session has no successor; its own date plus a day is the same
+        # rule with the same spacing, rather than a special case that never fires.
+        opens = successor.on if successor else chapter.on + timedelta(days=1)
+        if day >= opens:
+            due.add(f"{UNITS}/{chapter.unit}/{chapter.dirname}/{SOLUTIONS}")
+
+    # The capstone is built across two weeks and defended in session 15, so its
+    # solutions follow the last session rather than any one date inside it.
+    if day > max(chapter.on for chapter in CHAPTERS):
+        due.add(f"{UNITS}/{CAPSTONE.unit}/{CAPSTONE.dirname}/{SOLUTIONS}")
+    return due
+
+
 def week_published(destination: Path) -> int:
     """The furthest week the student repository already holds.
 
@@ -847,7 +889,10 @@ def main(argv: list[str] | None = None) -> int:
                 f"{owner}: its week ({number}) is not released yet, so its solutions cannot be"
             )
     already = read_released_solutions(destination) if destination.exists() else set()
-    released_solutions = frozenset(already | newly)
+    # The schedule releases solutions on its own; `--release-solutions` is still
+    # there for releasing one early, and nothing ever un-releases.
+    due = {owner for owner in solutions_due() if (week_of(Path(owner)) or 0) <= args.week}
+    released_solutions = frozenset(already | newly | due)
 
     print(f"publishing week {args.week} -> {destination}")
     opened = [chapter.dirname for chapter in CHAPTERS if chapter.module <= args.week]
