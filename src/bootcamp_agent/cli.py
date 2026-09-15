@@ -19,6 +19,11 @@ from bootcamp_agent.evals import EvalError, format_report, load_cases, run_evals
 from bootcamp_agent.llm import get_client
 
 ROOT = Path(__file__).resolve().parent.parent.parent
+
+#: The same marks the doctor and the notebook preflight use, so one learner
+#: reading three outputs sees one vocabulary.
+OK = "✅"
+FAIL = "❌"
 CORPUS_DIR = ROOT / "data" / "corpus"
 GOLDEN_PATH = ROOT / "data" / "evals" / "golden.jsonl"
 
@@ -75,6 +80,71 @@ def _doctor() -> int:
     return check_setup_main()
 
 
+def _start() -> int:
+    """From a fresh clone to a green doctor, in one command.
+
+    WHY THIS EXISTS. On day one, 26 learners forked the submissions repository
+    and 2 opened a pull request. Several reported `bootcamp: command not found`,
+    which is what you get for running a command from the wrong directory or
+    without `uv run` -- and the doctor, the thing that would have told them,
+    could not run until the install it was diagnosing had already worked.
+
+    So this does the install, then the diagnosis, then says the ONE next thing.
+    It is safe to run twice: every step checks before it acts.
+    """
+    import shutil
+    import subprocess
+
+    print("\nSetting up the course. This is safe to run as many times as you like.\n")
+
+    if not (ROOT / "pyproject.toml").is_file():
+        print(f"{FAIL} this is not the course folder: {Path.cwd()}", file=sys.stderr)
+        print(
+            "\n   Run it from inside the clone:\n"
+            "     cd dev3pack-cohort-2026-09\n"
+            "     uv run bootcamp start",
+            file=sys.stderr,
+        )
+        return 2
+    print(f"{OK} in the course folder")
+
+    if shutil.which("uv") is None:
+        print(f"{FAIL} uv is not installed", file=sys.stderr)
+        print(
+            "\n   macOS / Linux:  curl -LsSf https://astral.sh/uv/install.sh | sh\n"
+            '   Windows:        powershell -c "irm https://astral.sh/uv/install.ps1 | iex"\n'
+            "\n   Then close this terminal, open a new one, and run this again.",
+            file=sys.stderr,
+        )
+        return 2
+    print(f"{OK} uv is installed")
+
+    try:
+        import bootcamp_agent  # noqa: F401
+    except ImportError:
+        print("·  installing the course (about a minute the first time)…")
+        result = subprocess.run(["uv", "sync", "--group", "dev"], cwd=ROOT)
+        if result.returncode != 0:
+            print(f"\n{FAIL} `uv sync --group dev` failed, above.", file=sys.stderr)
+            return 1
+    print(f"{OK} the course is installed")
+
+    env, example = ROOT / ".env", ROOT / ".env.example"
+    if not env.exists() and example.is_file():
+        shutil.copyfile(example, env)
+        print(f"{OK} wrote .env (the offline lane; no key needed)")
+
+    print("\nChecking it works:\n")
+    failures = _doctor()
+
+    if failures:
+        print("\nFix the ❌ lines above, then run this again.")
+        return 1
+
+    print("\nYou are ready. Next:\n\n    uv run jupyter lab\n\nthen open 00-START-HERE.ipynb.\n")
+    return 0
+
+
 def _check(item_id: str) -> int:
     """Run one item's notebook and print its scorecard.
 
@@ -83,7 +153,7 @@ def _check(item_id: str) -> int:
     able to run them the same way.
     """
     from bootcamp_agent import submission
-    from bootcamp_agent.coursework import CourseworkError, render, run_notebook
+    from bootcamp_agent.coursework import CourseworkError, render, run_notebook, stored_scorecard
     from bootcamp_agent.curriculum import UnknownChapter
 
     try:
@@ -92,9 +162,26 @@ def _check(item_id: str) -> int:
         print(f"error: {error}", file=sys.stderr)
         return 2
     if not item.verifiable:
+        # NOT RE-RUNNING IS NOT THE SAME AS HAVING NOTHING TO SAY. This used to
+        # stop here and send the learner to Jupyter, which was defensible while
+        # sessions 1 and 10 carried no marks. They carry marks now, and the marks
+        # rest on exactly the outputs sitting in this file -- so a learner who
+        # asks "did it pass?" must be able to get the answer from the same
+        # command as everybody else, rather than by submitting to find out.
+        #
+        # `submit` has always read the file this way. This is the same read.
         print(f"{item.id}: {item.note}")
-        print("Run this one in Jupyter and read its review() cell there.")
-        return 0
+        print("Nothing can replay it, so this reads the outputs you saved.\n")
+        try:
+            card = stored_scorecard(item.notebook, item.id, item.exercises)
+        except CourseworkError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
+        print(render(card))
+        if not card.passed and not card.failed:
+            print("\nThat is what the saved file says, which is nothing yet.")
+            print("Open it in Jupyter, run every cell, SAVE, then check again.")
+        return 0 if not card.failed and not card.not_reached else 1
     print(f"running {item.id} ({item.title})…")
     try:
         card = run_notebook(item.notebook, item.exercises, item.id)
@@ -266,7 +353,54 @@ def _arrival(notebook: Path, when: str | None) -> str | None:
     return f"arrives {when}" if dated else "not published yet"
 
 
-def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
+def _no_evidence(item: object) -> str:
+    """Why this notebook cannot be handed in yet, or "" when it can.
+
+    A submission is a claim plus the evidence for it, and the evidence lives in
+    the saved cell outputs. Handing in a notebook that was never run used to
+    print `wrote ...` and exit 0, which is how somebody hands in nothing on day
+    one and finds out a week later.
+    """
+    import nbformat
+
+    from bootcamp_agent.coursework import evidence_of
+
+    notebook = getattr(item, "notebook", None)
+    if notebook is None or not notebook.is_file():
+        return ""
+    found = evidence_of(nbformat.read(notebook, as_version=4))
+
+    if found.never_ran:
+        return (
+            f"\n{item.id}: this notebook has never been run.\n\n"
+            f"  code cells        {found.code_cells}\n"
+            f"  cells executed    {found.executed_cells}\n"
+            f"  cells with output {found.cells_with_output}\n\n"
+            "Nothing was handed in. A submission is a claim plus the evidence for\n"
+            "it, and there is no evidence here.\n\n"
+            "Do this:\n"
+            "  1. Run every cell, top to bottom.\n"
+            "  2. Save the notebook.\n"
+            "  3. Run this command again."
+        )
+
+    if not getattr(item, "verifiable", True) and found.verdict_lines == 0:
+        return (
+            f"\n{item.id}: nothing in this notebook says an exercise passed.\n\n"
+            f"{item.id} is assistant-driven, so nobody re-runs it — the ✅ lines your\n"
+            "own notebook printed are the only evidence there is, and this file has\n"
+            f"none. Expected lines like:  ✅ {item.id}-e1 passed\n\n"
+            f"  cells executed    {found.executed_cells}\n"
+            f"  ✅/❌ lines found  {found.verdict_lines}\n\n"
+            "Nothing was handed in.\n\n"
+            "Most likely you ran the cells but did not SAVE. Press Ctrl+S, then run\n"
+            "this again. Or you have not run the check() cells yet — run them, save,\n"
+            "then run this again."
+        )
+    return ""
+
+
+def _submit(chapter_id: str, github: str, cohort: str, into: str | None, push: bool = False) -> int:
     """Build the bundle a learner opens a pull request with."""
     from pathlib import Path
 
@@ -283,6 +417,12 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
         print(f"cannot submit that: {error}")
         return 2
 
+    # Before anything is built, run or printed: is there anything to hand in?
+    refusal = _no_evidence(item)
+    if refusal:
+        print(refusal, file=sys.stderr)
+        return 3
+
     if not item.verifiable:
         # Sessions 1 and 10 need an assistant open — they edit its configuration
         # and author a skill. Running them unattended would score zero for work
@@ -290,7 +430,12 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
         # to be, rather than a failure being manufactured. The ids come from
         # `manual_reason` in the curriculum, never from a list written here.
         print(f"{item.id} ({item.title}) — {item.note}")
-        print("submitting your notebook as it stands, with no re-run and no marks.")
+        # "and no marks" was true until sessions 1 and 10 became scored, and then
+        # this line went on saying it directly above "score 100/100". A learner
+        # reading a tool contradict itself about their own marks has no way to
+        # tell which half is the bug.
+        print("submitting your notebook as it stands, with no re-run.")
+        print("The marks below are read from the outputs you saved.")
         # "As it stands" means what the notebook SAYS. Handing in `None` here
         # filled `not_reached` with every exercise and claimed `ran: false`, so
         # a learner whose notebook plainly showed `✅ ch01-e1 passed` was told it
@@ -327,7 +472,28 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None) -> int:
         for exercise in result["not_reached"]:
             print(f"  ·  {exercise} never ran")
     print(f"\nwrote {where}")
-    print("commit that folder to your fork and open a pull request.")
+
+    if not push:
+        print("commit that folder to your fork and open a pull request,")
+        print("or let it do that for you:")
+        print(f"    uv run bootcamp submit {item.id} --github {github} --push")
+        return 0
+
+    from bootcamp_agent.handin import HandInError
+    from bootcamp_agent.handin import push as hand_in
+
+    print("\nhanding it in…")
+    try:
+        url = hand_in(where, github, item.id)
+    except HandInError as error:
+        # The bundle is already written, so this is never a dead end: say what
+        # failed, and leave the manual route standing.
+        print(f"\n{error}", file=sys.stderr)
+        print(f"\nYour submission is still at {where}.", file=sys.stderr)
+        print("Copy that folder into your fork and open a pull request.", file=sys.stderr)
+        return 1
+    print(f"\n{OK} handed in: {url}")
+    print("Green CI means accepted. Merging is automatic — nobody has to be asked.")
     return 0
 
 
@@ -361,6 +527,7 @@ def bootcamp(argv: list[str] | None = None) -> int:
         description="Check your setup and your chapter exercises.",
     )
     sub = parser.add_subparsers(dest="command")
+    sub.add_parser("start", help="install everything and check it works — run this first")
     sub.add_parser("doctor", help="check this machine: Python, kernel, corpus, provider lane")
     checker = sub.add_parser("check", help="run one item's notebook and print its scorecard")
     checker.add_argument(
@@ -384,8 +551,15 @@ def bootcamp(argv: list[str] | None = None) -> int:
     submitter.add_argument("--github", required=True, help="your GitHub username")
     submitter.add_argument("--cohort", default="2026-09", help="which cohort (default 2026-09)")
     submitter.add_argument("--into", help="submissions root (default ./submissions)")
+    submitter.add_argument(
+        "--push",
+        action="store_true",
+        help="fork, commit and open the pull request for you (needs the gh CLI)",
+    )
     args = parser.parse_args(argv)
 
+    if args.command == "start":
+        return _start()
     if args.command == "doctor":
         return _doctor()
     if args.command == "check":
@@ -397,7 +571,7 @@ def bootcamp(argv: list[str] | None = None) -> int:
     if args.command == "read":
         return _read(args.port, args.build_only)
     if args.command == "submit":
-        return _submit(args.chapter, args.github, args.cohort, args.into)
+        return _submit(args.chapter, args.github, args.cohort, args.into, args.push)
     parser.print_help()
     return 2
 

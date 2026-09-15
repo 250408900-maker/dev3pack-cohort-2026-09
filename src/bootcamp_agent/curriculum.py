@@ -291,12 +291,20 @@ CAPSTONE = Project()
 #: directory name is the id, and the title carries the optionality in words,
 #: the way the Hugging Face course marks its bonus units.
 #: Relative to `UNITS_ROOT`, so a caller never rebuilds the `bonus/` prefix.
+#: Where hand-ins go. ONE spelling, because this has already been retyped into
+#: two scripts and the package needs it too -- and a submissions repo named
+#: slightly differently in one place sends somebody's work nowhere.
+SUBMISSIONS_REPO = "Gecko-Academy/dev3pack-submissions"
+SUBMISSIONS_URL = f"https://github.com/{SUBMISSIONS_REPO}"
+
+
 BONUS_DIRS: tuple[str, ...] = (
     f"{BONUS_ROOT}/b01-graph-rag",
     f"{BONUS_ROOT}/b02-multimodal-ingestion",
     f"{BONUS_ROOT}/b03-multi-agent-orchestration",
     f"{BONUS_ROOT}/b04-memory-consent-deletion",
     f"{BONUS_ROOT}/b05-deploy-evaluate-teardown",
+    f"{BONUS_ROOT}/b06-improve-the-coach",
 )
 
 #: The optional tracks. Each is one page pointing at material that lives at the

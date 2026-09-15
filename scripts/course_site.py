@@ -36,11 +36,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
+from bootcamp_agent import submission  # noqa: E402
 from bootcamp_agent.curriculum import (  # noqa: E402
     BONUS_DIRS,
     CAPSTONE,
     CHAPTERS,
     COURSE_RELEASE,
+    SUBMISSIONS_URL,  # noqa: E402
     TRACKS_ROOT,
     UNITS_ROOT,
     WEEK0_COURSES,
@@ -81,6 +83,12 @@ REPO_MAP: tuple[tuple[str, str], ...] = (
     (
         "00-START-HERE.ipynb",
         "The map a learner opens first. Lists every notebook in order and ticks what is finished.",
+    ),
+    (
+        "Makefile",
+        "Short names for the commands you run most: `make setup`, `make lab`, `make check`. "
+        "Every target is a one-line wrapper around a `uv run` command, so it is a convenience "
+        "and never a requirement — Windows has no `make` by default.",
     ),
     (
         "units/",
@@ -145,8 +153,11 @@ REPO_MAP: tuple[tuple[str, str], ...] = (
 UNIT0 = "unit0"
 UNIT0_ORDER = (
     "introduction",
+    "get-settled",
     "onboarding",
     "runtime-lanes",
+    "local-model",
+    "ask-your-assistant",
     "how-to-submit",
     "week0",
     "week1",
@@ -418,7 +429,18 @@ def render_index() -> str:
     ]
 
     runnable = sum(1 for chapter in CHAPTERS if chapter.runs_in_ci)
-    handed_in = [chapter for chapter in CHAPTERS if chapter.has_notebook and chapter.manual_reason]
+    # WHAT IS MARKED IS ASKED, NEVER INFERRED. This used to read `manual_reason`,
+    # which made the generator a second authority on the same fact -- and when
+    # sessions 1 and 10 became scored it went on printing "handed in, not marked"
+    # about work that now carries marks. `submission.resolve` is the one authority.
+    unmarked = [
+        chapter
+        for chapter in CHAPTERS
+        if chapter.has_notebook and not submission.resolve(chapter.chapter_id).scored
+    ]
+    unreplayable = [
+        chapter for chapter in CHAPTERS if chapter.has_notebook and chapter.manual_reason
+    ]
     lines += [
         "## Totals",
         "",
@@ -427,10 +449,12 @@ def render_index() -> str:
         f"- {len(CHAPTERS)} sessions, {runnable} of them running unattended in CI, "
         f"with {live_checks} scored checks; plus the capstone's {capstone_checks}.",
         f"- {week0_checks + live_checks + capstone_checks} checks across the course.",
-        f"- {len(handed_in)} sessions are handed in rather than marked, because they are",
-        "  assistant-driven and cannot be re-run; each says so in the table above.",
-        "",
+        f"- {len(unreplayable)} sessions are assistant-driven, so nothing can re-run them —",
+        "  they are still marked, on the evidence you save in the notebook.",
     ]
+    if unmarked:
+        lines.append(f"- {len(unmarked)} sessions are handed in rather than marked.")
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -521,11 +545,14 @@ def render_plan() -> str:
         ]
         for chapter in chapters:
             checks = exercise_ids(chapter.chapter_id)
-            marked = (
-                "handed in, not marked"
-                if chapter.manual_reason
-                else ("no notebook" if not chapter.has_notebook else f"{len(checks)} checks")
-            )
+            if not chapter.has_notebook:
+                marked = "no notebook"
+            elif not submission.resolve(chapter.chapter_id).scored:
+                marked = "handed in, not marked"
+            else:
+                marked = f"{len(checks)} checks"
+                if chapter.manual_reason:
+                    marked += ", marked from what you save"
             lines += [
                 f"### Session {chapter.number} — {chapter.title} ({chapter.weekday})",
                 "",
@@ -842,7 +869,18 @@ def render_items() -> str:
         if not chapter.has_notebook:
             continue
         exercises = exercise_ids(chapter.chapter_id)
-        scored = chapter.runs_in_ci
+        # THIS FILE IS THE GRADEBOOK'S COPY OF THE CURRICULUM. It is published to
+        # the submissions repository, whose collector reads it to decide what a
+        # row is worth -- so `scored` here decides whether a score reaches the
+        # app at all.
+        #
+        # It used to be `chapter.runs_in_ci`, which is the third place that
+        # welded "can we re-run it" to "is it worth marks". The other two were
+        # fixed when sessions 1 and 10 became scored; this one was missed, and
+        # the cost was invisible from inside this repository: every ch01 handed
+        # in came back `score: null`, the leaderboard showed 0/0 for everybody,
+        # and nothing here was failing.
+        item = submission.resolve(chapter.chapter_id)
         items.append(
             {
                 "id": chapter.chapter_id,
@@ -850,10 +888,10 @@ def render_items() -> str:
                 "kind": "session",
                 "week": chapter.module,
                 "date": chapter.on.isoformat(),
-                "scored": scored,
-                "verifiable": scored,
+                "scored": item.scored,
+                "verifiable": item.verifiable,
                 "exercises": len(exercises),
-                "max_score": len(exercises) * FULL_MARKS if scored else None,
+                "max_score": item.max_score,
             }
         )
     capstone = unit_exercise_ids(CAPSTONE.prefix)
@@ -894,7 +932,7 @@ LLMS = ROOT / "llms.txt"
 #: resolve in THAT tree, not in this one.
 COHORT_URL = "https://github.com/Gecko-Academy/dev3pack-cohort-2026-09"
 SITE_URL = "https://gecko-academy.github.io/dev3pack-cohort-2026-09"
-SUBMIT_URL = "https://github.com/Gecko-Academy/dev3pack-submissions"
+SUBMIT_URL = SUBMISSIONS_URL
 
 
 def render_llms(units: Path | None = None) -> str:

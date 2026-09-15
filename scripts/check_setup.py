@@ -1,16 +1,26 @@
-"""Pre-course setup doctor.
+"""The setup doctor.
 
-Run:  uv run python scripts/check_setup.py
+Run:  uv run bootcamp doctor
 
-Prints a green/red checklist. Every learner should see all green (warnings
-are fine) BEFORE the first class on September 14. Screenshot the output and
-post it in the cohort channel.
+Prints a green/red checklist. Every learner should see all green (warnings are
+fine) BEFORE their next session. Screenshot the output and post it in the cohort
+channel.
+
+THE LAST LINE IS COMPUTED, NOT TYPED. It used to read "See you September 14!"
+forever, so from the 15th onward the first thing a learner saw after a
+successful install was a date that had already passed -- which reads as software
+nobody has looked at since. It now names the next session from the curriculum,
+and says something true after the last one.
 """
 
 from __future__ import annotations
 
+import os
 import shutil
+import site
+import stat
 import sys
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,6 +28,66 @@ ROOT = Path(__file__).resolve().parent.parent
 OK = "✅"
 FAIL = "❌"
 WARN = "⚠️ "
+
+
+def _next_session(today: date | None = None) -> str:
+    """ "See you Tuesday, session 2" -- the next session on or after today.
+
+    Reads the curriculum rather than a literal, because a greeting frozen at the
+    first session's date is wrong on every day of the course except one.
+    """
+    sys.path.insert(0, str(ROOT / "src"))
+    from bootcamp_agent.curriculum import CHAPTERS
+
+    now = today or date.today()
+    upcoming = [chapter for chapter in CHAPTERS if chapter.on >= now]
+    if not upcoming:
+        return "That is the whole course, and your setup still works."
+    session = upcoming[0]
+    when = "today" if session.on == now else session.on.strftime("%A %d %B")
+    return f"Next up: session {session.number}, {session.title} — {when}."
+
+
+def _unhide_venv_pth_files() -> bool:
+    """Clear macOS's hidden flag from `.venv`'s `.pth` files.
+
+    FOUND BY A LEARNER ON DAY TWO -- Karol Rojas, in a pull request against the
+    cohort repository -- and it is the worst shape an onboarding bug can have:
+    every `uv run bootcamp ...` dies with `ModuleNotFoundError: No module named
+    'bootcamp_agent'` BEFORE the doctor that would have explained it gets to run.
+
+    uv marks what it installs into `.venv` hidden on macOS, and `site.py` skips
+    a hidden `.pth` -- including the editable-install one that points at `src/`.
+    So the package never reaches `sys.path`, on a machine where nothing is
+    actually wrong.
+
+    Clearing the flag alone only fixes the NEXT process, because `site.py` has
+    already run by the time this does. Re-adding the directory puts the package
+    on `sys.path` for this run too, which is what makes the doctor self-healing
+    rather than merely informative.
+
+    A no-op anywhere without `os.chflags`, which is everywhere but macOS.
+    """
+    if not hasattr(os, "chflags"):
+        return False
+    library = ROOT / ".venv" / "lib"
+    if not library.is_dir():
+        return False
+
+    cleared = False
+    directories: set[Path] = set()
+    for pth in library.glob("python*/site-packages/*.pth"):
+        try:
+            if os.stat(pth).st_flags & stat.UF_HIDDEN:
+                os.chflags(pth, 0)
+                cleared = True
+                directories.add(pth.parent)
+        except OSError:
+            # One unreadable file must not stop the others being repaired.
+            pass
+    for directory in directories:
+        site.addsitedir(str(directory))
+    return cleared
 
 
 def main() -> int:
@@ -40,6 +110,9 @@ def main() -> int:
         "install with: uv python install 3.11",
     )
     check("uv on PATH", shutil.which("uv") is not None, "https://docs.astral.sh/uv/")
+
+    if _unhide_venv_pth_files():
+        check("macOS had hidden the .venv .pth files — cleared", True)
 
     try:
         import bootcamp_agent
@@ -111,7 +184,7 @@ def main() -> int:
     if failures:
         print(f"\n{failures} problem(s) found — fix them and rerun.")
         return 1
-    print("\nAll set. See you September 14!")
+    print(f"\nAll set. {_next_session()}")
     return 0
 
 
