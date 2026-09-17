@@ -36,5 +36,5 @@ If you have twenty minutes before a session, run **3** first. Regex, parsing and
 retrieval turn up in almost every session after week 0, and the silent-failure
 example in section 1 is the one people remember a month later.
 
-See also [docs/guides/visual-explainers.md](../docs/guides/visual-explainers.md)
-— things to open in a browser and play with, mapped to the sessions they help.
+The same list, plus things to open in a browser and play with, is on the course
+site under **Demos and explainers**.
