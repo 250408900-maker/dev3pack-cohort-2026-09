@@ -264,6 +264,7 @@ units/en/unit1/session-04-bounded-tools/concepts-2.mdx
 units/en/unit1/session-04-bounded-tools/concepts-3.mdx
 units/en/unit1/session-04-bounded-tools/conclusion.mdx
 units/en/unit1/session-04-bounded-tools/demo.ipynb
+units/en/unit1/session-04-bounded-tools/follow-along.mdx
 units/en/unit1/session-04-bounded-tools/introduction.mdx
 units/en/unit1/session-04-bounded-tools/langchain_api_intent.py
 units/en/unit1/session-04-bounded-tools/langchain_api_intent_gradio.py
