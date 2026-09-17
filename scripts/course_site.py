@@ -191,6 +191,7 @@ TRAILING = (
     ("projects", "Real-world projects"),
     ("keep-learning", "Keep learning, at your level"),
     ("first-contribution", "Git, and your first contribution"),
+    ("coding-assistant", "Your coding assistant, step by step"),
 )
 
 HEADING = re.compile(r"^#\s+(.+?)\s*(?:\[\[[^\]]*\]\])?\s*$", re.M)

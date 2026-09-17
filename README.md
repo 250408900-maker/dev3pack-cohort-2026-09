@@ -66,6 +66,8 @@ folder. Every link below opens the file itself, not a folder to search.
 | **see the ideas visually** | [Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction) — interactive pages, mapped to sessions |
 | **get unstuck** | `coach("your question")` in any notebook — answers from the course pages, offline, no key. [Demo 5](demos/05_the_coach_up_close.ipynb) shows how to use it |
 | **contribute** | [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md) — add a question the coach gets wrong: ten minutes, no code |
+| **learn Jupyter from zero** | [`demos/06_jupyter_for_beginners.ipynb`](demos/06_jupyter_for_beginners.ipynb) — cells, run order, errors, in fifteen minutes |
+| **use a coding assistant well** | [Your coding assistant, step by step](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/coding-assistant/introduction) — Claude Code 101, five prompts, and where the line is |
 | **learn git, and contribute anywhere** | [Git, and your first contribution](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/first-contribution/introduction) — the nine commands, the errors, and where to find a first issue |
 | **hand in** | `uv run bootcamp submit chNN --github <you> --push` — see [Handing in](#handing-in) |
 | **see the leaderboard** | [`TRACK.md` in the submissions repository](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md) |
@@ -203,7 +205,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (49 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (50 paths). |
 | Week 1 | Mon 14 Sep | unit1 |
 | Week 2 | Mon 21 Sep | unit2 |
 | Week 3 | Mon 28 Sep | unit3 |

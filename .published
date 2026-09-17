@@ -45,6 +45,7 @@ demos/02_one_question_three_ways.ipynb
 demos/03_regex_parsing_retrieval.ipynb
 demos/04_ollama_on_colab.ipynb
 demos/05_the_coach_up_close.ipynb
+demos/06_jupyter_for_beginners.ipynb
 demos/README.md
 depth/01-full-stack/notebook.ipynb
 depth/01-full-stack/solutions/notebook.ipynb
@@ -165,6 +166,7 @@ units/en/bonus/b03-multi-agent-orchestration/introduction.mdx
 units/en/bonus/b04-memory-consent-deletion/introduction.mdx
 units/en/bonus/b05-deploy-evaluate-teardown/introduction.mdx
 units/en/bonus/b06-improve-the-coach/introduction.mdx
+units/en/tracks/coding-assistant/introduction.mdx
 units/en/tracks/cookbook/introduction.mdx
 units/en/tracks/demos/introduction.mdx
 units/en/tracks/depth/introduction.mdx

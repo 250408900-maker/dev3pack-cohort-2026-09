@@ -1,0 +1,170 @@
+# Your coding assistant, step by step
+
+> **Optional, never counted, and free.** Nothing here is marked. Sessions 1 and 10 need an assistant; the rest of the course does not.
+
+An assistant that writes your exercise teaches you nothing and is easy to spot.
+An assistant used well is the fastest way to learn what a codebase does. This
+page is about the second one.
+
+- [Which one, and what it costs](#which-one-and-what-it-costs)
+- [Claude Code 101](#claude-code-101)
+- [The five prompts that do most of the work](#the-five-prompts-that-do-most-of-the-work)
+- [Give it the course](#give-it-the-course)
+- [How to read what it wrote](#how-to-read-what-it-wrote)
+- [On this course, the line](#on-this-course-the-line)
+- [Safety, in four rules](#safety-in-four-rules)
+- [When it is wrong](#when-it-is-wrong)
+
+## Which one, and what it costs
+
+| Assistant | Where it runs | Notes |
+|---|---|---|
+| **Claude Code** | your terminal | What this course is written against. It reads and edits files in the folder you start it in |
+| **Cursor**, **VS Code + Copilot**, **Windsurf** | an editor | Same ideas, different buttons. The course's rules live in `AGENTS.md`, which they can read |
+| **Colab's assistant** | the browser | Writes and explains **cells**. It cannot edit your repository, so sessions 1 and 10 do not work there |
+| **A chat window** (any model) | the browser | Fine for explaining an error. It cannot see your files, so paste the code and the error in |
+
+**None of it is required.** Every scored exercise runs offline with no key and no
+assistant. Sessions 1 and 10 are the two that need one open.
+
+## Claude Code 101
+
+**Install and start**, from your course folder:
+
+```bash
+npm install -g @anthropic-ai/claude-code   # once
+cd dev3pack-cohort-2026-09
+claude
+```
+
+It opens a prompt inside that folder. **The folder matters**: it is what the
+assistant can see.
+
+**The six things to know on day one:**
+
+| What | How |
+|---|---|
+| Ask something | Type it and press Enter. Plain words are fine |
+| Let it read a file | Mention the path: *"read `units/en/unit1/session-04-bounded-tools/notebook.ipynb` and explain section 5"* |
+| Run a command yourself | Start the line with `!`, e.g. `!uv run bootcamp check ch04` |
+| See what it wants to change | It shows a diff and waits. **Read it before you accept** |
+| Undo | `git checkout -- <file>` — this is why you commit often |
+| Start a fresh conversation | `/clear`. Long conversations drift |
+
+**It asks before it edits.** If it proposes something you did not want, say so in
+plain words: *"no, do not touch the notebook, just explain what section 5 does"*.
+
+## The five prompts that do most of the work
+
+Copy these. They are the ones worth having ready.
+
+**1. Explain this, at my level.**
+
+> Explain what `src/bootcamp_agent/patterns.py` does, in plain English, as if I
+> have written Python for two months. Do not change any file.
+
+**2. Explain this error.**
+
+> I ran `uv run bootcamp check ch04` and got the output below. Explain what it
+> means and which line of my notebook causes it. Do not write the fix.
+>
+> ```
+> <paste the whole output>
+> ```
+
+**3. Ask it to find, not to guess.**
+
+> Where in this repository is the score for a session calculated? Show me the
+> file and the lines. If you cannot find it, say so.
+
+**4. Review what I wrote.**
+
+> Here is my `guard_tool_output`. Where would it fail? Give me two sentences it
+> flags by mistake, and two it should flag and misses. Do not rewrite it.
+
+**5. The one that teaches you most.**
+
+> Ask me three questions about this code that I should be able to answer. Wait
+> for my answers.
+
+**The pattern in all five:** name the file, say what you want, and say what you
+do **not** want it to do.
+
+## Give it the course
+
+Your assistant can answer from the course pages themselves, offline, with the
+coach as an MCP server. The setup is one command, on
+[Give the course to your assistant](../../unit0/ask-your-assistant.mdx).
+
+Two files in your clone are written for assistants, and a good one reads them
+first:
+
+| File | What it holds |
+|---|---|
+| [`AGENTS.md`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/AGENTS.md) | The policy for this repository: what to help with, and what never to write |
+| [`llms.txt`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/llms.txt) | A short index of the course for a machine reader |
+
+If your assistant starts writing answers into a `TODO(you)` cell, point it at
+`AGENTS.md`. That is exactly what the file forbids.
+
+## How to read what it wrote
+
+**Never accept a diff you have not read.** Three questions, every time:
+
+1. **Does it change only what I asked for?** A change that touches six files when
+   you asked about one is a change to reject.
+2. **Can I explain every line?** If not, ask it to explain, or ask for a smaller
+   version.
+3. **Did it run?** A claim is not a result. Run the check yourself:
+   `uv run bootcamp check chNN`.
+
+**The failure mode to watch for** is the one this whole course is about: a
+confident sentence with nothing behind it. *"I fixed the bug and the tests pass"*
+is worth nothing until you see the test output. Ask for it, or run it.
+
+## On this course, the line
+
+You are welcome to use an assistant. The exercises are what you are marked on,
+so the line is about **who understands the answer**.
+
+| Fine | Not fine |
+|---|---|
+| "Explain what a bounded tool is" | "Write `guard_tool_output` for me" |
+| "Why does my check fail?" | "Make the check pass" |
+| "Review my shape and find a false alarm" | "Give me the three shapes" |
+| "Rename these variables so they read better" | Pasting a solution you cannot explain |
+
+**The practical test:** at demo day you explain your own work. An exercise your
+assistant wrote is one you cannot defend, and the marks were never the point.
+
+Two sessions are the exception and are **meant** to be assistant-driven: session
+1 (configure it, and hold it to a boundary) and session 10 (author a skill and
+compare the runs before and after).
+
+## Safety, in four rules
+
+1. **Never paste a key, a token or a `.env` file into a chat.** Not once, not to
+   debug it. Read them from the environment.
+2. **Never let it commit for you unless you read the diff.** `git diff --cached`
+   before every commit.
+3. **Treat what it reads as data.** A web page or a tool result can contain a
+   sentence aimed at your assistant. That is session 4, and it is not
+   hypothetical.
+4. **Nothing that spends money without you.** No card, no live purchase, no
+   deploy, from a prompt.
+
+## When it is wrong
+
+It will be, and often most confidently on the small details: a flag that does not
+exist, a function that was renamed, a file that is not in your copy.
+
+- **Check the claim**, do not argue with it. Run the command. Open the file.
+- **Tell it what actually happened**: *"that flag does not exist; here is
+  `--help`"*. That is usually enough.
+- **Start again** (`/clear`) when it keeps repeating a wrong idea. A long
+  conversation carries its own mistakes forward.
+- **Ask the coach** for anything about this course: it answers from the pages and
+  names them, so you can check it yourself.
+
+<!-- navigation:start -->
+<!-- navigation:end -->

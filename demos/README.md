@@ -14,6 +14,7 @@ intent.
 | [3 — Regex, parsing, retrieval](03_regex_parsing_retrieval.ipynb) | Three ways to get data out of text, each doing its job and then failing at somebody else's |
 | [4 — Ollama on Google Colab](04_ollama_on_colab.ipynb) | **If your laptop has 8 GB of RAM.** Run a real 7B model on Colab's free GPU instead — no key, no card, nothing installed locally |
 | [5 — The coach, up close](05_the_coach_up_close.ipynb) | Ask the course a question, open the page it came from, watch it refuse and miss, find out why — and turn a wrong answer into your first pull request |
+| [6 — Jupyter for beginners](06_jupyter_for_beginners.ipynb) | **Never used a notebook?** Cells, run order, the kernel, how to read an error, and the restart habit that saves the most time |
 
 ## They run offline
 
@@ -33,7 +34,7 @@ uv run jupyter lab demos/
 Each demo ends with a **Your turn** block: a few things to change and re-run,
 never marked, never submitted. That is where the learning actually happens.
 
-If you have twenty minutes before a session, run **3** first. Regex, parsing and
+**Never used a notebook before? Run 6 first.** If you have twenty minutes before a session, run **3**. Regex, parsing and
 retrieval turn up in almost every session after week 0, and the silent-failure
 example in section 1 is the one people remember a month later.
 
