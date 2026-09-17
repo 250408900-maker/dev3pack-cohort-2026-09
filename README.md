@@ -92,7 +92,7 @@ Three threads recur: [loop](docs/guides/loop-engineering.md), [graph](docs/guide
 | Kind | Where | Role |
 |---|---|---|
 | **Week 0 units** (`w01`–`w12`) | [units/en/](units/en/) | Self-paced, ungraded, available now. The fast lane is the floor Session 1 assumes. |
-| **Sessions** (`session-01`–`15`) | same tree | Live, weekday, two hours. Introduction, concepts, quiz, exercise notebook, solutions. Session 15 has no notebook. |
+| **Sessions** (`session-01`–`15`) | same tree | Live, weekday, two hours. Introduction, concepts, quiz, exercise notebook, and a demo. Solutions for sessions 1–3 only. Session 15 has no notebook. |
 | **Capstone** | units/en/unit2/capstone/ — opens with week 2 | Built between sessions from week 2. `src/bootcamp_agent/` is the finished shape. |
 | **Bonus / depth / cookbook / workspaces** | linked below | Optional. Never counted. |
 
@@ -175,9 +175,11 @@ more week lands and you `git pull`.
 A correction is withdrawn as well as added: the publisher removes a file the current week no longer contains, so a fix actually reaches somebody who already pulled.
 
 <!-- release-plan:end -->
-Solutions are separate again: a session's `solutions/` notebook is released
-after that session, so you meet an exercise before its answer is one folder
-away. Until then, `hint(reveal=True)` is the worked answer, and it costs marks.
+Solutions: week 0 and sessions 1–3 carry a `solutions/` notebook. From session 4
+on, they do not. Each session ships with everything running except one cell, and
+that cell is yours to solve — a solution would only be that cell, answered. When
+you are stuck, `hint(reveal=True)` is the worked answer (it costs marks), and
+`coach(...)` answers from the course pages for free.
 
 ## Week 0
 
