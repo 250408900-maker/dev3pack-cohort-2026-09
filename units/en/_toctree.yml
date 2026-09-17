@@ -163,6 +163,10 @@
   sections:
   - local: tracks/keep-learning/introduction
     title: "Keep learning, at your level"
+- title: "Git, and your first contribution"
+  sections:
+  - local: tracks/first-contribution/introduction
+    title: "Git, and your first contribution"
 - title: "(Optional) Bonus units"
   sections:
   - title: "Bonus 1. Graph RAG and hybrid search"

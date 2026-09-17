@@ -1,6 +1,6 @@
 {"question": "how do I hand my work in", "expected_doc_ids": ["unit0/how-to-submit"]}
 {"question": "where do I submit my notebook", "expected_doc_ids": ["unit0/how-to-submit"]}
-{"question": "do I need to fork anything", "expected_doc_ids": ["unit0/how-to-submit", "unit0/get-settled"]}
+{"question": "do I need to fork anything", "expected_doc_ids": ["unit0/how-to-submit", "unit0/get-settled", "tracks/first-contribution/introduction"]}
 {"question": "what does bootcamp start do", "expected_doc_ids": ["unit0/get-settled"]}
 {"question": "how do I install uv", "expected_doc_ids": ["unit0/get-settled", "unit0/onboarding"]}
 {"question": "bootcamp command not found", "expected_doc_ids": ["unit0/get-settled", "unit0/onboarding"]}

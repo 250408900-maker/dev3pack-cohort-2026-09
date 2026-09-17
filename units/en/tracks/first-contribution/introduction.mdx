@@ -1,0 +1,196 @@
+# Git, and your first contribution
+
+> **Optional, never counted, and free.** Nothing here is marked. It exists because "open a pull request" is said a hundred times on this course and explained nowhere.
+
+You do not need to be a programmer to contribute to open source. Most first
+contributions are a fixed typo, a clearer sentence, or a translation.
+
+- [Git in five minutes](#git-in-five-minutes)
+- [The nine commands you actually use](#the-nine-commands-you-actually-use)
+- [When something goes wrong](#when-something-goes-wrong)
+- [Your first contribution, in the browser](#your-first-contribution-in-the-browser)
+- [Where to find something to work on](#where-to-find-something-to-work-on)
+- [What a pull request must contain](#what-a-pull-request-must-contain)
+- [Suggesting an improvement, instead of writing it](#suggesting-an-improvement-instead-of-writing-it)
+
+## Git in five minutes
+
+**Git** saves versions of a folder. **GitHub** keeps a copy of that folder online
+so other people can see it and suggest changes.
+
+Five words, and everything else is built from them:
+
+| Word | What it is | Everyday version |
+|---|---|---|
+| **repository** | a folder git is watching | the project |
+| **commit** | a saved version, with a message | a save point, with a note on what you did |
+| **branch** | a line of commits with a name | your own copy to work in, so nobody else is disturbed |
+| **fork** | your own copy of somebody else's repository, on GitHub | you cannot write in their project; you can write in your copy |
+| **pull request** | "please take my change into your project" | the suggestion, where people discuss it |
+
+**The whole flow, in one line:** fork → branch → change → commit → push → pull
+request → review → merge.
+
+You cannot break anything. You have no write access to somebody else's project,
+and every change is proposed, discussed and reversible.
+
+## The nine commands you actually use
+
+```bash
+git clone <url>          # download a repository for the first time
+git status               # what have I changed? Run this whenever you are lost
+git pull                 # get other people's latest changes
+git checkout -b my-fix   # start a new branch called my-fix
+git add <file>           # choose what goes into the next save point
+git commit -m "message"  # save it, with a note
+git push -u origin my-fix  # send your branch to GitHub
+git log --oneline -5     # the last five save points
+git diff                 # what exactly did I change?
+```
+
+That is nine of the roughly two hundred git commands, and it is the set nearly
+everyone uses every day.
+
+**Write the message for the person who reads it in six months.** `fix typo in
+setup guide` is good; `update` and `changes` are not.
+
+## When something goes wrong
+
+Nothing here loses your work. Read the error, then find it in this table.
+
+| It says | What happened | What to do |
+|---|---|---|
+| `rejected … fetch first` | Somebody else pushed before you | `git pull --rebase`, then push again |
+| `CONFLICT (content): Merge conflict in <file>` | You and somebody else changed the same lines | Open the file. Keep the right lines, delete the `<<<<<<<`, `=======` and `>>>>>>>` markers, then `git add <file>` and `git commit` |
+| `fatal: not a git repository` | You are in the wrong folder | `cd` into the project folder |
+| `Please tell me who you are` | Git has no name yet | `git config --global user.name "Your Name"` and `git config --global user.email "you@example.com"` |
+| `Permission denied` or `403` | You are pushing to somebody else's project | Push to **your fork** instead. You never push to theirs |
+| `nothing to commit` | You saved the file in your editor, but did not `git add` it | `git status` shows what is there, then `git add` |
+| You committed on the wrong branch | It happens to everybody | `git branch my-fix`, then `git checkout my-fix`. Your commit is on the new branch |
+
+**Lost?** `git status` answers almost every question, and it never changes
+anything.
+
+## Your first contribution, in the browser
+
+No git installed, and nothing to set up. This works for a typo, a sentence, or a
+translation.
+
+1. Open the file on GitHub and click the **pencil** icon.
+2. Make the change.
+3. Scroll down, write a short message: what you changed, and why.
+4. Choose **Create a new branch for this commit**.
+5. Click **Propose changes**, then **Create pull request**.
+
+That is a complete contribution. Somebody reviews it, and it either merges or
+they ask a question.
+
+**Want to practise first?** [first-contributions](https://github.com/firstcontributions/first-contributions)
+exists only for this: you add your name to a list, open a pull request, and it
+gets merged. It is not a real project, and that is the point — you practise the
+mechanics with nothing at stake.
+
+## Where to find something to work on
+
+**Start here, because we review it and we know you:**
+
+| Project | What you can do |
+|---|---|
+| [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach) | Our own coach. [Eleven open good first issues](https://github.com/Gecko-Academy/gecko-ai-coach/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22), plus a ten-minute first rung that needs no code, and two translations waiting for a native reviewer |
+
+**Then the wider world.** Search, do not go by reputation. A famous project is
+not the same as a welcoming one: on 17 September 2026, freeCodeCamp had **no**
+open issues labelled *good first issue*, and `rustlings` and `public-apis` had
+none either.
+
+| Where | What it gives you |
+|---|---|
+| [goodfirstissue.dev](https://goodfirstissue.dev) | Beginner issues from active projects, by language |
+| [up-for-grabs.net](https://up-for-grabs.net) | Projects that keep a list of tasks for newcomers |
+| [awesome-for-beginners](https://github.com/MunGell/awesome-for-beginners) | A curated list of beginner-friendly projects |
+| [GitHub topic: good-first-issue](https://github.com/topics/good-first-issue) | Projects that tag their issues this way |
+
+Or search GitHub directly. This finds open beginner issues in Python that nobody
+has taken:
+
+```
+is:issue is:open label:"good first issue" no:assignee language:Python
+```
+
+**How to pick one:**
+
+- The project was **pushed to in the last month**. A quiet project will not review you.
+- The issue is **not assigned** and has no pull request linked already.
+- You can **explain what it asks for** in your own words. If you cannot, pick another.
+- **Say you are taking it** in a comment, so two people do not do the same work.
+
+**Docs count.** A README that confused you, confused a hundred people. Fixing it
+is a real contribution, and it is how many maintainers start.
+
+## What a pull request must contain
+
+The same five things, whether it is your first or your hundredth. This is the
+shape we use on this course, and the one our own pull requests follow.
+
+| Part | The question it answers |
+|---|---|
+| **Why** | What problem or need is this for? One or two sentences |
+| **What** | What does it change? The feature, the addition, the fix |
+| **The problem** | The error, the wrong behaviour, or the gap. Paste the message |
+| **The evidence** | What you ran, and what it printed. Before and after |
+| **The tests** | What you added or ran so somebody can be sure it works |
+
+```markdown
+## Why
+The submit command told people to "commit that folder to your fork" without
+saying which fork, so three submissions were opened on the wrong repository.
+
+## What
+The message now names the submissions repository, the exact path, and the steps
+to do it in a browser.
+
+## The problem
+```
+commit that folder to your fork and open a pull request
+```
+
+## Evidence
+Before: the line above.
+After: the full block, with the repository URL and `submissions/<you>/ch04/`.
+
+## Tests
+`test_submit_without_push_names_the_submissions_repository_and_the_exact_path`,
+plus the full suite: 626 passed.
+```
+
+**Two rules worth more than the template:**
+
+- **Small.** One idea per pull request. A reviewer who can read it in five
+  minutes will merge it today.
+- **Honest.** Say what you did not test, and what you are unsure about. Nobody
+  is annoyed by that, and everybody is annoyed by finding it themselves.
+
+## Suggesting an improvement, instead of writing it
+
+You do not have to write the code. A well-written issue is a contribution, and
+often a more useful one.
+
+A good issue has four parts:
+
+1. **What you expected**, in one sentence.
+2. **What happened instead.** Paste the exact error or output.
+3. **How to see it again.** The command, the page, or the steps.
+4. **Your guess**, if you have one. "I think it is X" is welcome, and being
+   wrong costs nothing.
+
+Ours have forms that ask these questions for you:
+
+- [A question the coach gets wrong](https://github.com/Gecko-Academy/gecko-ai-coach/issues/new?template=miss.yml)
+- [An idea, or something broken](https://github.com/Gecko-Academy/gecko-ai-coach/issues/new?template=idea.yml)
+
+**Before you open one:** search the existing issues. If it is already there, add
+what you know to that one instead — a second example is worth more than a second
+issue.
+
+<!-- navigation:start -->
+<!-- navigation:end -->

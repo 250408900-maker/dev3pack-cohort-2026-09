@@ -66,6 +66,7 @@ folder. Every link below opens the file itself, not a folder to search.
 | **see the ideas visually** | [Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction) — interactive pages, mapped to sessions |
 | **get unstuck** | `coach("your question")` in any notebook — answers from the course pages, offline, no key. [Demo 5](demos/05_the_coach_up_close.ipynb) shows how to use it |
 | **contribute** | [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md) — add a question the coach gets wrong: ten minutes, no code |
+| **learn git, and contribute anywhere** | [Git, and your first contribution](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/first-contribution/introduction) — the nine commands, the errors, and where to find a first issue |
 | **hand in** | `uv run bootcamp submit chNN --github <you> --push` — see [Handing in](#handing-in) |
 | **see the leaderboard** | [`TRACK.md` in the submissions repository](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md) |
 | **run a model on a small laptop** | [`demos/04_ollama_on_colab.ipynb`](demos/04_ollama_on_colab.ipynb) |
@@ -202,7 +203,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (48 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (49 paths). |
 | Week 1 | Mon 14 Sep | unit1 |
 | Week 2 | Mon 21 Sep | unit2 |
 | Week 3 | Mon 28 Sep | unit3 |
