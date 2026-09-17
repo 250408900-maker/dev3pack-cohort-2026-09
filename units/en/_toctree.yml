@@ -109,6 +109,8 @@
       title: "Boundary tests: oversized input, forbidden targets"
     - local: unit1/session-04-bounded-tools/concepts-3
       title: "Tool output is untrusted"
+    - local: unit1/session-04-bounded-tools/contract-in-plain-words
+      title: "What \"contract\" means, in plain words"
     - local: unit1/session-04-bounded-tools/follow-along
       title: "Follow along: today's class"
     - local: unit1/session-04-bounded-tools/quiz
