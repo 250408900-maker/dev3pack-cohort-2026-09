@@ -31,13 +31,15 @@ ollama list
 
 You should see `nomic-embed-text` in the list.
 
-**8 GB of RAM is enough.** This model is small. If Ollama does not run on your
-machine at all, use Colab: open
-[demo 4 — Ollama on Colab](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/04_ollama_on_colab.ipynb),
-and run `ollama pull nomic-embed-text` there instead.
+**8 GB of RAM is enough.** This model is small.
 
-**No Ollama at all?** Follow parts 1 and 2 with us, and watch part 3 on the
-screen. Nothing in part 3 is marked.
+**Ollama does not run on your machine?** Use Google Colab. You get the same model,
+and nothing is installed on your laptop:
+**[open project 01 in Colab](https://colab.research.google.com/github/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/01-clothing-reviews/notebook.ipynb)**,
+then follow **Get the model → On Google Colab** at the top of the notebook. One
+cell does everything, in about 3 minutes. Start it before class too.
+
+**Parts 1, 2 and 4 need no model at all.** Only part 3 does.
 
 ## 1. See what an embedding is
 
@@ -108,7 +110,10 @@ Open the notebook:
 uv run jupyter lab projects/01-clothing-reviews/notebook.ipynb
 ```
 
-**Run the first cell.** It must print `ready: chromadb …, model nomic-embed-text`.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/projects/01-clothing-reviews/notebook.ipynb)
+
+**Read "Get the model" at the top of the notebook**, and pick your laptop or
+Colab. Then run the setup cell. It must print `ready: chromadb …, model nomic-embed-text`.
 If it does not, it tells you the command that fixes it.
 
 We write each task together. Type the code in your own notebook as we go, then
