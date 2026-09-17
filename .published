@@ -44,6 +44,7 @@ demos/01_api_request_up_close.ipynb
 demos/02_one_question_three_ways.ipynb
 demos/03_regex_parsing_retrieval.ipynb
 demos/04_ollama_on_colab.ipynb
+demos/05_the_coach_up_close.ipynb
 demos/README.md
 depth/01-full-stack/notebook.ipynb
 depth/01-full-stack/solutions/notebook.ipynb

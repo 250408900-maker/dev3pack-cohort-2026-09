@@ -64,7 +64,8 @@ folder. Every link below opens the file itself, not a folder to search.
 | **watch it work first** | the **Demo** column in the same table, or [`demos/`](demos/) |
 | **build something real** | [`projects/`](projects/) — open data, a local model, ChromaDB |
 | **see the ideas visually** | [Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction) — interactive pages, mapped to sessions |
-| **get unstuck** | `coach("your question")` in any notebook — answers from the course pages, offline, no key |
+| **get unstuck** | `coach("your question")` in any notebook — answers from the course pages, offline, no key. [Demo 5](demos/05_the_coach_up_close.ipynb) shows how to use it |
+| **contribute** | [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md) — add a question the coach gets wrong: ten minutes, no code |
 | **hand in** | `uv run bootcamp submit chNN --github <you> --push` — see [Handing in](#handing-in) |
 | **see the leaderboard** | [`TRACK.md` in the submissions repository](https://github.com/Gecko-Academy/dev3pack-submissions/blob/main/TRACK.md) |
 | **run a model on a small laptop** | [`demos/04_ollama_on_colab.ipynb`](demos/04_ollama_on_colab.ipynb) |
@@ -295,7 +296,7 @@ Optional. Never counted. Never required for the certificate.
 | 4 | [Long-term memory, consent, and deletion](units/en/bonus/b04-memory-consent-deletion/) |
 | 5 | [Deploy, evaluate, and tear down](units/en/bonus/b05-deploy-evaluate-teardown/) |
 
-- **[demos/](demos/)** — notebooks run in class, to run again afterwards: [an API request up close](demos/01_api_request_up_close.ipynb) (real calls to a public pet API), [one question three ways](demos/02_one_question_three_ways.ipynb) (prompt vs API vs MCP), [regex, parsing and retrieval](demos/03_regex_parsing_retrieval.ipynb), and [Ollama on Colab](demos/04_ollama_on_colab.ipynb) for small laptops.
+- **[demos/](demos/)** — notebooks run in class, to run again afterwards: [an API request up close](demos/01_api_request_up_close.ipynb) (real calls to a public pet API), [one question three ways](demos/02_one_question_three_ways.ipynb) (prompt vs API vs MCP), [regex, parsing and retrieval](demos/03_regex_parsing_retrieval.ipynb), [Ollama on Colab](demos/04_ollama_on_colab.ipynb) for small laptops, and [the coach up close](demos/05_the_coach_up_close.ipynb).
 - **[projects/](projects/)** — real-world projects on open data with a local model and ChromaDB. [Project 01: what are customers really saying?](projects/01-clothing-reviews/notebook.ipynb) Needs `uv sync --extra projects`.
 - **[ship-it/](ship-it/)** — turn the capstone into a surface somebody else can call, and a storefront an agent can buy from.
 - **[Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction)** — Transformer Explainer, LLM Visualization, Tiktokenizer, Regexper, the Embedding Projector and more, each mapped to the session it helps.
