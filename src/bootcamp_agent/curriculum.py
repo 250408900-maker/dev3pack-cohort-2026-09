@@ -317,6 +317,7 @@ TRACK_DIRS: tuple[str, ...] = (
     f"{TRACKS_ROOT}/ship-it",
     f"{TRACKS_ROOT}/demos",
     f"{TRACKS_ROOT}/projects",
+    f"{TRACKS_ROOT}/keep-learning",
 )
 
 BY_PREFIX: dict[str, Unit] = {unit.prefix: unit for unit in WEEK0_UNITS}

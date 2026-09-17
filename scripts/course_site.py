@@ -189,6 +189,7 @@ TRAILING = (
     ("ship-it", "Ship It track (optional)"),
     ("demos", "Demos and explainers"),
     ("projects", "Real-world projects"),
+    ("keep-learning", "Keep learning, at your level"),
 )
 
 HEADING = re.compile(r"^#\s+(.+?)\s*(?:\[\[[^\]]*\]\])?\s*$", re.M)
