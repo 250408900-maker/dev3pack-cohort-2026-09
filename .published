@@ -83,6 +83,10 @@ integrations/sendai-txs/index.ts
 integrations/sendai-txs/package.json
 llms.txt
 modules/README.md
+projects/01-clothing-reviews/data/LICENSE.md
+projects/01-clothing-reviews/data/reviews.csv
+projects/01-clothing-reviews/notebook.ipynb
+projects/README.md
 pyproject.toml
 scripts/check_notebooks.py
 scripts/check_setup.py
@@ -122,6 +126,8 @@ src/bootcamp_agent/llm.py
 src/bootcamp_agent/ollama.py
 src/bootcamp_agent/patterns.py
 src/bootcamp_agent/preflight.py
+src/bootcamp_agent/projects/__init__.py
+src/bootcamp_agent/projects/clothing_reviews.py
 src/bootcamp_agent/read.py
 src/bootcamp_agent/retrieval.py
 src/bootcamp_agent/schema.py
@@ -161,6 +167,7 @@ units/en/tracks/cookbook/introduction.mdx
 units/en/tracks/demos/introduction.mdx
 units/en/tracks/depth/introduction.mdx
 units/en/tracks/final-assignment/introduction.mdx
+units/en/tracks/projects/introduction.mdx
 units/en/tracks/ship-it/introduction.mdx
 units/en/tracks/workspaces/introduction.mdx
 units/en/unit0/ask-your-assistant.mdx

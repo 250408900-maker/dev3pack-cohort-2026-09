@@ -117,6 +117,7 @@ Where everything lives, and what a student receives.
 | `depth/` | Six optional software-engineering modules, about 45 minutes each. Never counted. | day one |
 | `cookbook/` | Ten Gecko notebooks, from comprehending an OpenAPI spec to a verified loop on a fork. Optional. | day one |
 | `workspaces/` | Four open projects to build in. Optional, unmarked, no checks. | day one |
+| `projects/` | Real-world projects: a brief, open data, a local model and ChromaDB. Optional, never counted; needs `uv sync --extra projects`. | day one |
 | `demos/` | Short notebooks to run in class and again afterwards. Never graded, never submitted; they make one idea concrete in a few minutes. | day one |
 | `ship-it/` | The optional launch track: turn the capstone into an MCP server somebody else can call, and a storefront an agent can buy from. Offline and never counted. | day one |
 | `integrations/` | Worked integrations the sessions link into rather than re-explain. | day one |
@@ -165,7 +166,7 @@ more week lands and you `git pull`.
 
 | Arrives | Date | What is added |
 |---|---|---|
-| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (45 paths). |
+| Week 0 | now | Everything above except the sessions: the twelve week-0 units, the welcome pages, the bonus track and the whole toolchain (47 paths). |
 | Week 1 | Mon 14 Sep | unit1 |
 | Week 2 | Mon 21 Sep | unit2 |
 | Week 3 | Mon 28 Sep | unit3 |

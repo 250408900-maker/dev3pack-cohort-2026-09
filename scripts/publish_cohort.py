@@ -121,6 +121,7 @@ ALWAYS = (
     "docs/course-index.md",
     "depth",
     "demos",
+    "projects",
     "ship-it",
     "final_assignment",
     "README.md",
