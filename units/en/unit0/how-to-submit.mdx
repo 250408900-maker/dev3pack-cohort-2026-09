@@ -69,10 +69,42 @@ uv run bootcamp submit ch03 --github <you>       # writes submissions/<you>/ch03
 ```
 
 The bundle holds two files: `submission.json`, the claim, and `notebook.ipynb`,
-the evidence. Copy the folder into your fork of the submissions repository and
-open a pull request. CI checks the shape, that the folder is yours, that the
-notebook is the file the claim was written against, and that the score follows
-from the passes and help the claim lists.
+the evidence. CI checks the shape, that the folder is yours, that the notebook is
+the file the claim was written against, and that the score follows from the passes
+and help the claim lists.
+
+### No `gh`? Hand it in from your browser
+
+No GitHub CLI and no git needed. Two things decide whether it works: **the
+repository** and **the path**.
+
+1. Open **[Gecko-Academy/dev3pack-submissions](https://github.com/Gecko-Academy/dev3pack-submissions)**
+   and click **Fork**. This is the **submissions** repository.
+2. In **your** fork, open the `submissions` folder.
+3. Click **Add file → Upload files**. From your course folder, drag in the folder
+   `submissions/<you>` — the one `submit` just wrote.
+4. Check the paths before you continue. The files must end up at:
+
+   ```
+   submissions/<you>/ch03/notebook.ipynb
+   submissions/<you>/ch03/submission.json
+   ```
+
+5. Choose **Create a new branch**, click **Propose changes**, then **Create pull
+   request**. The base repository must be `Gecko-Academy/dev3pack-submissions`.
+
+A green check means accepted.
+
+**The two mistakes we see most:**
+
+| Mistake | What happens | Fix |
+|---|---|---|
+| The pull request is on **`dev3pack-cohort-2026-09`**, the course repository | Nothing is checked or marked. It is closed with a note | Open it on `dev3pack-submissions` instead |
+| The files are at `ch03/…` instead of `submissions/<you>/ch03/…` | **No check runs**, and the pull request waits for ever | Upload the folder inside `submissions/`, as in step 3 |
+
+Do not commit your notebooks or `submissions/` to your copy of the course: the
+course repository is read-only for everyone, and `submissions/` is ignored there
+on purpose.
 
 **Using `gh` by hand?** `gh pr create` needs `--body`, or it hangs waiting for
 input you cannot see.

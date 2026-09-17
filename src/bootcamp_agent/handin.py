@@ -51,7 +51,8 @@ def _require_gh(run: object) -> None:
         raise HandInError(
             "`--push` needs the GitHub CLI, which is not installed.\n"
             "    https://cli.github.com  — then: gh auth login\n"
-            "Without it, the folder is written and the manual steps are printed."
+            "Without it, the folder is still written, and the steps to hand it in\n"
+            "in your browser are printed below."
         )
     if run(["gh", "auth", "status"]).code != 0:  # type: ignore[operator]
         raise HandInError("gh is installed but not signed in. Run: gh auth login")

@@ -400,6 +400,44 @@ def _no_evidence(item: object) -> str:
     return ""
 
 
+def _manual_route(github: str, item_id: str, where: Path) -> str:
+    """How to hand in without `gh`: which repository, which path, in a browser.
+
+    WHY IT NAMES THE REPOSITORY. The old line was "commit that folder to your fork
+    and open a pull request", and it named neither. A learner reads it standing in
+    their clone of the COURSE, so "your fork" meant the course repository: three
+    pull requests with submissions and edited lessons landed there, where nothing
+    is ever marked. Another copied the folder to the root of the submissions fork,
+    one level too high, where no check runs and the pull request waits for ever.
+    """
+    from bootcamp_agent.curriculum import SUBMISSIONS_REPO, SUBMISSIONS_URL
+
+    target = f"submissions/{github}/{item_id}"
+    return "\n".join(
+        [
+            "",
+            f"Hand it in to {SUBMISSIONS_REPO} — the SUBMISSIONS repository.",
+            "Never open the pull request on the course repository (dev3pack-cohort-2026-09).",
+            "",
+            "Easiest, if you have the GitHub CLI (https://cli.github.com, then: gh auth login):",
+            f"    uv run bootcamp submit {item_id} --github {github} --push",
+            "",
+            "Without it, in your browser. No git needed:",
+            f"  1. Open {SUBMISSIONS_URL} and click Fork.",
+            "  2. In YOUR fork, open the `submissions` folder.",
+            "  3. Click Add file, then Upload files. Drag in this folder from your computer:",
+            f"         {where.parent}",
+            "     The files must end up at:",
+            f"         {target}/notebook.ipynb",
+            f"         {target}/submission.json",
+            '  4. Choose "Create a new branch", click Propose changes,',
+            f"     then Create pull request. The base must be {SUBMISSIONS_REPO}.",
+            "",
+            "A green check on the pull request means it is accepted. Merging is automatic.",
+        ]
+    )
+
+
 def _submit(chapter_id: str, github: str, cohort: str, into: str | None, push: bool = False) -> int:
     """Build the bundle a learner opens a pull request with."""
     from pathlib import Path
@@ -474,9 +512,7 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None, push: b
     print(f"\nwrote {where}")
 
     if not push:
-        print("commit that folder to your fork and open a pull request,")
-        print("or let it do that for you:")
-        print(f"    uv run bootcamp submit {item.id} --github {github} --push")
+        print(_manual_route(github, item.id, where))
         return 0
 
     from bootcamp_agent.handin import HandInError
@@ -490,7 +526,7 @@ def _submit(chapter_id: str, github: str, cohort: str, into: str | None, push: b
         # failed, and leave the manual route standing.
         print(f"\n{error}", file=sys.stderr)
         print(f"\nYour submission is still at {where}.", file=sys.stderr)
-        print("Copy that folder into your fork and open a pull request.", file=sys.stderr)
+        print(_manual_route(github, item.id, where), file=sys.stderr)
         return 1
     print(f"\n{OK} handed in: {url}")
     print("Green CI means accepted. Merging is automatic — nobody has to be asked.")
