@@ -6,14 +6,15 @@ run, in the order we run it in class.
 | Part | What | Time |
 |---|---|---|
 | [0](#0-before-we-start) | Before we start: update and install | 5 min |
-| [1](#1-see-what-an-embedding-is) | See what an embedding is | 10 min |
-| [2](#2-live-demo-a-tool-that-cannot-be-pointed-anywhere) | Live demo: a tool that cannot be pointed anywhere | 25 min |
-| [3](#3-real-project-what-are-customers-really-saying) | Real project: what are customers really saying? | 45 min |
-| [4](#4-your-exercise) | Your exercise, and handing it in | the rest |
+| [1](#1-see-a-regex-as-a-picture) | See a regex as a picture | 8 min |
+| [2](#2-see-what-an-embedding-is) | See what an embedding is | 10 min |
+| [3](#3-live-demo-a-tool-that-cannot-be-pointed-anywhere) | Live demo: a tool that cannot be pointed anywhere | 25 min |
+| [4](#4-real-project-what-are-customers-really-saying) | Real project: what are customers really saying? | 45 min |
+| [5](#5-your-exercise) | Your exercise, and handing it in | the rest |
 
 ## 0. Before we start
 
-**Start the download now.** The embedding model is 274 MB, and part 3 needs it.
+**Start the download now.** The embedding model is 274 MB, and part 4 needs it.
 
 From your course folder:
 
@@ -39,9 +40,40 @@ and nothing is installed on your laptop:
 then follow **Get the model → On Google Colab** at the top of the notebook. One
 cell does everything, in about 3 minutes. Start it before class too.
 
-**Parts 1, 2 and 4 need no model at all.** Only part 3 does.
+**Parts 1, 2, 3 and 5 need no model at all.** Only part 4 does.
 
-## 1. See what an embedding is
+## 1. See a regex as a picture
+
+Open **[regexper.com](https://regexper.com/)**. Paste a regular expression, and it
+draws it as a diagram you can read from left to right. Each pattern below is also
+a link that opens its diagram directly.
+
+| Pattern | Matches | Does not match | The lesson |
+|---|---|---|---|
+| [`order\s+(\d{4})`](https://regexper.com/#order%5Cs%2B%28%5Cd%7B4%7D%29) | `order 1234` | `order #1234`, `order 12` | A regex that does not match gives you **no error**, just nothing |
+| [`^[A-Z]{3}$`](https://regexper.com/#%5E%5BA-Z%5D%7B3%7D%24) | `USD`, `BRL` | `usd`, `USDT`, `US` | `^` and `$` mean the **whole** string. Remove them and `USDT` matches |
+| [`^https:\/\/reviews.example\/`](https://regexper.com/#%5Ehttps%3A%5C%2F%5C%2Freviews.example%5C%2F) | `https://reviews.example/hotel` | `http://reviews.example/` | The unescaped `.` means **any character**, so `https://reviewsXexample/` matches too |
+| [`^https:\/\/reviews\.example\/`](https://regexper.com/#%5Ehttps%3A%5C%2F%5C%2Freviews%5C.example%5C%2F) | `https://reviews.example/hotel` | `https://reviewsXexample/` | `\.` is a real dot. Compare the two diagrams |
+
+**In Regexper, write `/` as `\/`.** Regexper reads patterns the way JavaScript does,
+and a bare `/` stops it with `Error: Line 1: expected "|"`. Python does not need
+the backslash.
+
+**The one nobody writes by hand.** Today's pattern builder writes this regex for you:
+
+```python
+near(one_of("send", "share", "leak"), one_of("api key", "password", "token"))
+```
+
+[`(?:send|share|leak)[\s\S]{0,40}?(?:api\s+key|password|token)`](https://regexper.com/#%28%3F%3Asend%7Cshare%7Cleak%29%5B%5Cs%5CS%5D%7B0%2C40%7D%3F%28%3F%3Aapi%5Cs%2Bkey%7Cpassword%7Ctoken%29)
+
+It means: *a leak word, then at most 40 characters, then a secret.* Open the
+diagram and follow it with your finger.
+
+**The point for today:** a regex checks **shape**, not meaning. In part 3 we use
+shapes to catch an order hidden in a web page.
+
+## 2. See what an embedding is
 
 Open **[projector.tensorflow.org](https://projector.tensorflow.org/)**. It loads
 10,000 English words, each one a list of 200 numbers. Words used in similar
@@ -62,12 +94,12 @@ Try these, in this order:
 | `safe` | `dangerous` is close. **Opposites appear in the same sentences.** |
 
 **The point for today:** similarity is not meaning. An embedding cannot tell
-*safe* from *dangerous*. That is why the guard in part 2 checks rules, not "does
+*safe* from *dangerous*. That is why the guard in part 3 checks rules, not "does
 this look like an attack".
 
 **Trust the list, not the picture.** The picture squeezes 200 numbers into 3.
 
-## 2. Live demo: a tool that cannot be pointed anywhere
+## 3. Live demo: a tool that cannot be pointed anywhere
 
 Open the notebook:
 [`units/en/unit1/session-04-bounded-tools/demo.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit1/session-04-bounded-tools/demo.ipynb)
@@ -95,7 +127,7 @@ Run the cells from the top. Stop at each heading:
 `urlparse` check in section 4 with `"reviews.example" in url`, re-run, and count
 what slips through.
 
-## 3. Real project: what are customers really saying?
+## 4. Real project: what are customers really saying?
 
 An online shop has 1,000 reviews and nobody has time to read them. We build two
 things with a model on your own machine and a vector database:
@@ -138,7 +170,7 @@ write, and nothing is marked.
 **After class:** open the notebook, run the cells in order, and read the comments.
 You get the same results you saw on the screen.
 
-## 4. Your exercise
+## 5. Your exercise
 
 Today's marked work is in the session notebook:
 [`units/en/unit1/session-04-bounded-tools/notebook.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/units/en/unit1/session-04-bounded-tools/notebook.ipynb)
