@@ -29,7 +29,7 @@ measure()
 ```
 
 ```
-hit rate 18/25 = 72% (top-k)
+hit rate 20/25 = 80% (top-k)
 
 missed:
   how do I hand my work in
@@ -48,9 +48,9 @@ The retriever returns three passages. Is three right? Nobody measured it. So
 measure it:
 
 ```python
-measure()            # 18/25 = 72%   as shipped
-measure(top_k=5)     # 20/25 = 80%
-measure(top_k=8)     # 22/25 = 88%
+measure()            # 20/25 = 80%   as shipped
+measure(top_k=5)     # 22/25 = 88%
+measure(top_k=8)     # 22/25 = 88%   and no further: the curve flattened
 ```
 
 Eight points for one argument. Take the win?
@@ -91,7 +91,7 @@ the only way you ever find out is by running the number again.
 
 - **Chunk size** — worked above; there is more in it
 - **The stopword list** in `retrieval.py` — which words are you throwing away that carry meaning here?
-- **Title weighting** — a page titled "Handing work in" should win a question about handing work in. *I tried this and it moved nothing. Find out why, or find the version that works*
+- **Title weighting** — on its own it moved one question; combined with BM25 and one-passage-per-page it is part of a 64% → 80% gain. Turn each off with `ask(..., title_weight=0)`, `bm25=False`, `one_per_page=False` and measure what each is worth
 - **Query expansion** — "submit" and "hand in" are the same question
 - **A better metric** — does the passage answer the question, or did we just reach its page?
 - **More labelled questions** — twenty-five is thin, and the set is a contribution too

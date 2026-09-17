@@ -37,6 +37,7 @@ data/corpus/mcp-overview.md
 data/corpus/prompt-injection.md
 data/corpus/rag-basics.md
 data/corpus/structured-outputs.md
+data/evals/coach-heldout.jsonl
 data/evals/coach.jsonl
 data/evals/golden.jsonl
 demos/01_api_request_up_close.ipynb
