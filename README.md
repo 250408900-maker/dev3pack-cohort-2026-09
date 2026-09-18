@@ -64,6 +64,7 @@ folder. Every link below opens the file itself, not a folder to search.
 | **watch it work first** | the **Demo** column in the same table, or [`demos/`](demos/) |
 | **build something real** | [`projects/`](projects/) — open data, a local model, ChromaDB |
 | **see the ideas visually** | [Demos and explainers](https://gecko-academy.github.io/dev3pack-cohort-2026-09/tracks/demos/introduction) — interactive pages, mapped to sessions |
+| **ask from your phone** | [**@gecko_coach_bot**](https://t.me/gecko_coach_bot) on Telegram — answers from the course pages, names the page, no install |
 | **get unstuck** | `coach("your question")` in any notebook — answers from the course pages, offline, no key. [Demo 5](demos/05_the_coach_up_close.ipynb) shows how to use it |
 | **contribute** | [gecko-ai-coach](https://github.com/Gecko-Academy/gecko-ai-coach/blob/main/CONTRIBUTING.md) — add a question the coach gets wrong: ten minutes, no code |
 | **put an agent in a chat** | [`demos/07_the_coach_in_a_chat.ipynb`](demos/07_the_coach_in_a_chat.ipynb), then [the Telegram guide](https://gecko-academy.github.io/dev3pack-cohort-2026-09/unit1/session-05-deterministic-mini-agent/telegram-guide) |

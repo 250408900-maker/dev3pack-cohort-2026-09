@@ -1,13 +1,41 @@
 # Give the course to your assistant
 
-Three ways, and they all use the same retriever. None of them needs a key.
+Four ways, and they all use the same retriever. None of them needs a key.
 
+- **On your phone** — [**@gecko_coach_bot**](https://t.me/gecko_coach_bot) on Telegram. Nothing to install
 - **In the notebook** — `coach("your question")`, answered in the kernel, no assistant involved
 - **In a terminal** — one command, no install, no clone of anything extra
 - **In your assistant** — an MCP server, so Claude Code, Claude Desktop or Cursor can read the course before answering you
 
-Use the first while you work. The second when you are not in a notebook. Add the
-third once, and your assistant stops guessing about this course.
+Use the phone on the bus, the notebook while you work, the terminal when you are
+not in one, and add the MCP server once so your assistant stops guessing about
+this course.
+
+## On your phone
+
+Open [**@gecko_coach_bot**](https://t.me/gecko_coach_bot) in Telegram and ask it something:
+
+```
+where do I submit my work
+what is a bounded tool
+how do I run a model on my laptop
+```
+
+Every answer names the page it came from and links to it, so you can go and read
+the rest. When the course does not cover something, it says **NOT IN THESE
+PAGES** rather than inventing an answer — try asking it about Kubernetes.
+
+**What it is, exactly.** The same retriever as the other three, running on a free
+serverless function, reading the published pages straight from GitHub. **There is
+no model behind it**: it finds the passage and quotes it. That is why it costs
+nothing, needs no key, and cannot hallucinate — the words in the reply are the
+words on the page.
+
+It answers 8 questions an hour per chat, so one person cannot use it up, and it
+only knows the weeks that have been published.
+
+It is also [an open project you can improve](https://github.com/Gecko-Academy/gecko-ai-coach):
+when it misses, that is a real issue with your name on it.
 
 ## In the notebook
 
