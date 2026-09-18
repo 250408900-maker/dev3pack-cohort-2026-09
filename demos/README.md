@@ -16,6 +16,7 @@ intent.
 | [5 — The coach, up close](05_the_coach_up_close.ipynb) | Ask the course a question, open the page it came from, watch it refuse and miss, find out why — and turn a wrong answer into your first pull request |
 | [6 — Jupyter for beginners](06_jupyter_for_beginners.ipynb) | **Never used a notebook?** Cells, run order, the kernel, how to read an error, and the restart habit that saves the most time |
 | [7 — The coach, in a chat](07_the_coach_in_a_chat.ipynb) | Session 5's four exits as four replies to a person, on a recorded chat — then a real one, if you have a token |
+| [8 — The weekly challenge](08_the_weekly_challenge.ipynb) | Ana's expense bot: three tools that refuse by name, a page that talks to the model, and the week-1 challenge scored 300/500 |
 
 ## They run offline
 

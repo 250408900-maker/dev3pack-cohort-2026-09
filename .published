@@ -47,6 +47,7 @@ demos/04_ollama_on_colab.ipynb
 demos/05_the_coach_up_close.ipynb
 demos/06_jupyter_for_beginners.ipynb
 demos/07_the_coach_in_a_chat.ipynb
+demos/08_the_weekly_challenge.ipynb
 demos/README.md
 demos/fixtures/telegram-getupdates.json
 depth/01-full-stack/notebook.ipynb
