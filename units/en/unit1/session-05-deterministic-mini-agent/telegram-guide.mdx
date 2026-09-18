@@ -184,8 +184,14 @@ uv run python integrations/hermes-telegram/check_hermes.py
 with persistent memory. What you built in session 5 is a bounded loop whose every
 exit you chose and can count. Both are correct; they are built for different
 trust models — and Hermes's strength, memory that shapes later behaviour, is also
-a **persistent injection surface** (sessions 11 and 14). It also needs a model
-provider key, so it costs money; the bot on this page costs nothing.
+a **persistent injection surface** (sessions 11 and 14).
+
+**It does not have to cost anything.** Its quick setup is an OAuth login on a
+free plan with no API key, and it also runs
+[entirely on Ollama](https://github.com/NousResearch/hermes-agent/blob/main/website/docs/guides/local-ollama-setup.md) —
+the same local model from week 0, nothing leaving your machine. What it costs is
+not money: it is a bigger thing to understand, and a memory that remembers what
+it was told.
 
 The shape worth aiming at is **both**: Hermes carrying the messages, and your
 bounded loop deciding what happens.

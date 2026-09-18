@@ -10,7 +10,8 @@ run, in the order we run it in class.
 | [2](#2-write-the-exits-before-the-body) | Write the exits before the body | 10 min |
 | [3](#3-live-demo-the-coach-in-a-chat) | Live demo: the coach in a chat | 20 min |
 | [4](#4-your-exercise) | Your exercise: the loop, and its four exits | 45 min |
-| [5](#5-optional-put-it-on-telegram) | Optional: put it on Telegram | at home |
+| [5](#5-the-weekly-challenge) | The weekly challenge: a bot that refuses well | 5 min |
+| [6](#6-optional-put-it-on-telegram) | Optional: put it on Telegram | at home |
 
 ## 0. Before we start
 
@@ -30,6 +31,11 @@ Open two files:
 - [`demos/07_the_coach_in_a_chat.ipynb`](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/07_the_coach_in_a_chat.ipynb) — the demo we run together
 
 ## 1. A loop you already have
+
+**New today, and worth ten minutes of the session:**
+[From a prompt, to a loop, to an agent](prompt-loop-agent.mdx) — what the model
+is actually being sent (the setup, **the verb**, the shape), why one prompt stops
+being enough, and where the boundary you built yesterday fits.
 
 Yesterday you built tools that refuse. Today you build the thing that **calls
 them and knows when to stop**.
@@ -136,7 +142,20 @@ uv run bootcamp submit ch05 --github <your-github-name> --push
 
 **Save the notebook first.** `submit` reads the file on disk.
 
-## 5. Optional: put it on Telegram
+## 5. The weekly challenge
+
+[A bot that refuses well](weekly-challenge.mdx) — bonus, uncounted, and there is
+a check you can run yourself:
+
+```python
+from bootcamp_agent.bonus import bonus
+from bootcamp_agent.weekly import week1_bot
+bonus("week1-bot", respond)
+```
+
+Most of it is demo 7 already. Start from `reply_to`.
+
+## 6. Optional: put it on Telegram
 
 Not marked, and nothing in the course needs it. When you want your agent in your
 pocket: [Your coach on Telegram](telegram-guide.mdx) is the token, the

@@ -1,0 +1,126 @@
+# From a prompt, to a loop, to an agent
+
+Three words get used as if they were the same thing. They are three steps, and
+each one adds exactly one idea.
+
+```
+prompt   one question, one answer, no tools
+loop     call · read · decide · stop
+agent    a loop with tools, and a boundary
+```
+
+Sessions 2 and 3 were the first. Session 4 built the tools and the boundary.
+Today is the middle one: **the stopping**.
+
+## A prompt is a contract, not a wish
+
+Most bad output is not the model being stupid. It is a request with no operation
+in it. A prompt has three layers, and people usually write only the third.
+
+| Layer | The question it answers | Weak | Strong |
+|---|---|---|---|
+| **The setup** | who is answering, and from what | *"You are a helpful assistant"* | *"Answer only from the passages below. If they do not contain the answer, say NOT IN THESE PAGES."* |
+| **The verb** | what operation is this | *"tell me about"* | *classify · extract · rewrite · compare · rank · refuse* |
+| **The shape** | what the answer looks like | *"be concise"* | `{"answer": str, "citations": [str], "confidence": float}` |
+
+### The verb is the part people skip
+
+*"Tell me about this review"* contains no operation, so the model picks one for
+you — and picks a different one next run. Every complaint about a model being
+"inconsistent" starts here.
+
+Compare:
+
+```
+tell me about this review
+    → a paragraph. Sometimes a summary, sometimes an opinion, sometimes both.
+
+classify this review as praise, complaint or question,
+and quote the sentence that decided it
+    → a label from a closed set, and its evidence.
+```
+
+Nothing about the model changed. The second one **can be checked**, and a
+request that cannot be checked cannot be relied on.
+
+### The same question, four ways
+
+| | The prompt | What comes back |
+|---|---|---|
+| 1 | `tell me about this review` | a paragraph, different every run |
+| 2 | `classify this review` | a label — and often a paragraph too |
+| 3 | `classify it as praise \| complaint \| question` | a label from a closed set |
+| 4 | …`and quote the sentence that decided it` | a label **and** its evidence |
+
+Step 4 is where session 3 lives: a shape narrow enough that a parser can
+**reject** what comes back. `confidence: 7` is refused, because the contract says
+`0.0–1.0`, and a refusal you can see beats a number you cannot trust.
+
+### Three habits worth more than any template
+
+- **Name the operation.** If you cannot say which verb it is, the model cannot either.
+- **Give the answer a shape** you could write a parser for — then write the parser.
+- **Make refusal legal.** A model with no way to say "not here" will invent
+  something. `NOT IN THESE PAGES` is a correct answer, and the coach in demo 7
+  gives exactly that.
+
+## Then one prompt stops being enough
+
+The question needs today's data, or two lookups, or a calculation. So the answer
+arrives in steps, and something has to drive them:
+
+```
+   ask  →  call a tool  →  read the result  →  decide  →  call again, or stop
+```
+
+That is the whole of a loop. The interesting half is **stop**.
+
+A loop that can only end by succeeding will do one of three things instead of
+ending: spend its whole budget, call the same tool until something outside stops
+it, or hand a traceback to whatever called it. None of those is a decision you
+made.
+
+So: **write the exits before the body.** Session 5 has four, and three of them
+are refusals.
+
+| `stopped_because` | When |
+|---|---|
+| `answered` | the plan says it has the answer |
+| `repeated_call` | the same tool, the same arguments, twice in a row |
+| `budget` | the calls are spent, or the plan ran out |
+| `tool_error` | a tool refused |
+
+## And then it is an agent
+
+An agent is that loop, with tools it may call and a boundary it may not cross.
+You already have both halves:
+
+| From | What it gave you |
+|---|---|
+| Session 4 | tools with contracts, an allow-list, a guard over what they return |
+| Session 5 | the loop, its budget, and a receipt that says why it stopped |
+
+**A bigger model does not remove any of this.** It makes better guesses inside
+the same boundary — and the boundary is the part you own.
+
+## Where this ladder goes
+
+Frameworks exist that give you the whole thing at once:
+[Hermes](https://github.com/NousResearch/hermes-agent) is one agent reachable
+from Telegram, Discord, Slack and Signal, with memory that grows as you use it.
+
+It is free to try — an OAuth login on a free plan, or pointed at the same local
+Ollama model you used in week 0. It is worth seeing, and worth being clear-eyed
+about. Its strength — memory that
+shapes later behaviour — is also a place an attacker can write to, which is
+sessions 11 and 14. What you built today is the part that keeps such a thing
+honest: **a boundary, a budget, and a receipt.**
+
+## See it
+
+- [Demo 7 — the coach, in a chat](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/07_the_coach_in_a_chat.ipynb):
+  the four exits, as four replies to a person.
+- [Demo 5 — the coach, up close](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/05_the_coach_up_close.ipynb):
+  what "answer only from these pages" looks like when it works, and when it misses.
+- [The weekly challenge](weekly-challenge.mdx): build a bot whose exits a
+  stranger can see.

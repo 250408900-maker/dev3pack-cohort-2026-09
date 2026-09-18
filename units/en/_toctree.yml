@@ -129,8 +129,12 @@
       title: "Safe termination, and the trace as the receipt"
     - local: unit1/session-05-deterministic-mini-agent/follow-along
       title: "Follow along: today's class"
+    - local: unit1/session-05-deterministic-mini-agent/prompt-loop-agent
+      title: "From a prompt, to a loop, to an agent"
     - local: unit1/session-05-deterministic-mini-agent/telegram-guide
       title: "Your coach on Telegram (optional)"
+    - local: unit1/session-05-deterministic-mini-agent/weekly-challenge
+      title: "Weekly challenge — a bot that refuses well"
     - local: unit1/session-05-deterministic-mini-agent/quiz
       title: "Quick quiz (ungraded)"
     - local: unit1/session-05-deterministic-mini-agent/conclusion

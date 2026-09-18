@@ -1,0 +1,108 @@
+# Weekly challenge — a bot that refuses well
+
+> **Bonus, and uncounted.** Your marks for week 1 come from the sessions. This adds to them and can take nothing away. It runs offline, needs no key and no token, and there is a check you can run yourself.
+
+**The brief:** build a bot whose four exits a stranger can see, without reading
+your code.
+
+Not a cleverer answer. A **visible** one: somebody types into it and can tell,
+every time, whether it answered, refused because you asked twice, refused
+because the budget is spent, or refused because a tool said no.
+
+## What you hand in
+
+One function. That is the whole contract:
+
+```python
+def respond(text: str, chat: dict) -> dict:
+    """One message in, one receipt out."""
+    return {"stopped_because": "answered", "reply": "..."}
+```
+
+| Key | What it holds |
+|---|---|
+| `stopped_because` | one of `answered` · `repeated_call` · `budget` · `tool_error` |
+| `reply` | what the person reads. **A refusal is a sentence, not a word** |
+
+`chat` is yours: a dict that survives between messages, so you can keep the
+count of calls in it.
+
+**The transport is not the exercise.** Telegram, a terminal loop, a web form, a
+test — the check does not care and neither do we.
+
+## Check it yourself
+
+```python
+from bootcamp_agent.bonus import bonus
+from bootcamp_agent.weekly import week1_bot   # registers the check
+
+bonus("week1-bot", respond)
+```
+
+It sends six messages through your function, in one conversation: **the same
+question twice**, then four more. Then one message that cannot work.
+
+| It wants to see | Why |
+|---|---|
+| `answered` | it works at all |
+| `repeated_call` | the repeat must **not** spend a call |
+| `budget` | the fourth question is refused **before** the call |
+| `tool_error` | `/page this-page-does-not-exist` ends in a refusal that quotes what was asked for |
+| a refusal of at least four words | somebody is reading it |
+
+Every failure names the thing to fix. For example:
+
+```
+❌ bonus week1-bot: the 'repeated_call' reply is 'no'.
+   A refusal is written for a reader: say what happened and what they can do
+```
+
+## Where to start
+
+**You already have most of it.**
+[Demo 7](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/07_the_coach_in_a_chat.ipynb)
+has a `reply_to` that does exactly this shape, and the demo's own chat transcript
+shows the four receipts. Copy it into a file of your own and make it yours.
+
+Three ways to go further, in order of how much they teach:
+
+1. **Give it your own tools.** The coach is one. A dictionary lookup, a currency
+   converter, your project 01 review search — anything with a contract that can
+   refuse.
+2. **Swap in your `run_loop` from `ch05-e2`.** Demo 7's section 7 shows the
+   adapter: your loop, walking a plan, behind the same `respond`.
+3. **Put it on Telegram**, with [the guide](telegram-guide.mdx). Optional, and
+   the only part that needs a token.
+
+## What "refuses well" means
+
+The check enforces the shape. These are what make it good, and they are what we
+will read:
+
+- **The refusal names the cause and the way out.** *"stopped: 3 questions is my
+  budget for this chat. It resets tomorrow"* — not *"error"*.
+- **The repeat costs nothing.** No tool call, no model call, no spend.
+- **The budget is checked before the call**, never after.
+- **A tool's own words survive** into the reply. The tool knows why it refused;
+  do not replace that with a generic sentence.
+- **Nothing crashes.** A bot that dies on one bad message is a bot that is down.
+
+## Hand it in
+
+```bash
+uv run bootcamp submit ch05 --github <your-github-name> --push
+```
+
+Put your bot in the same notebook, under the session's exercises, with the
+`bonus("week1-bot", respond)` cell showing green. The bonus does not change your
+score — it is there so the person reviewing sees you went past the floor, and so
+**you** can tell you did.
+
+**Share it in the group too.** A screenshot of your bot refusing well teaches the
+next person more than this page does.
+
+## Next week
+
+The same bot, with retrieval behind it: sessions 6 and 7 replace *"the pages say
+something about X"* with a passage and a citation, and give you a number for how
+often it finds the right one.

@@ -161,6 +161,8 @@ src/bootcamp_agent/week0_checks/mcp_course.py
 src/bootcamp_agent/week0_checks/mcp_course_integrations.py
 src/bootcamp_agent/week0_checks/software_engineering.py
 src/bootcamp_agent/week0_checks/software_engineering_classes.py
+src/bootcamp_agent/weekly/__init__.py
+src/bootcamp_agent/weekly/week1_bot.py
 units/en/_toctree.yml
 units/en/bonus/b01-graph-rag/introduction.mdx
 units/en/bonus/b02-multimodal-ingestion/introduction.mdx
@@ -285,8 +287,10 @@ units/en/unit1/session-05-deterministic-mini-agent/conclusion.mdx
 units/en/unit1/session-05-deterministic-mini-agent/follow-along.mdx
 units/en/unit1/session-05-deterministic-mini-agent/introduction.mdx
 units/en/unit1/session-05-deterministic-mini-agent/notebook.ipynb
+units/en/unit1/session-05-deterministic-mini-agent/prompt-loop-agent.mdx
 units/en/unit1/session-05-deterministic-mini-agent/quiz.mdx
 units/en/unit1/session-05-deterministic-mini-agent/telegram-guide.mdx
+units/en/unit1/session-05-deterministic-mini-agent/weekly-challenge.mdx
 uv.lock
 workspaces/README.md
 workspaces/news-to-telegram/fixtures/hn-front-page.json
