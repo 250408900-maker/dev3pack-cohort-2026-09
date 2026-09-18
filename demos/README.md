@@ -15,6 +15,7 @@ intent.
 | [4 — Ollama on Google Colab](04_ollama_on_colab.ipynb) | **If your laptop has 8 GB of RAM.** Run a real 7B model on Colab's free GPU instead — no key, no card, nothing installed locally |
 | [5 — The coach, up close](05_the_coach_up_close.ipynb) | Ask the course a question, open the page it came from, watch it refuse and miss, find out why — and turn a wrong answer into your first pull request |
 | [6 — Jupyter for beginners](06_jupyter_for_beginners.ipynb) | **Never used a notebook?** Cells, run order, the kernel, how to read an error, and the restart habit that saves the most time |
+| [7 — The coach, in a chat](07_the_coach_in_a_chat.ipynb) | Session 5's four exits as four replies to a person, on a recorded chat — then a real one, if you have a token |
 
 ## They run offline
 

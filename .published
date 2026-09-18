@@ -46,7 +46,9 @@ demos/03_regex_parsing_retrieval.ipynb
 demos/04_ollama_on_colab.ipynb
 demos/05_the_coach_up_close.ipynb
 demos/06_jupyter_for_beginners.ipynb
+demos/07_the_coach_in_a_chat.ipynb
 demos/README.md
+demos/fixtures/telegram-getupdates.json
 depth/01-full-stack/notebook.ipynb
 depth/01-full-stack/solutions/notebook.ipynb
 depth/02-managing-data/notebook.ipynb
@@ -283,6 +285,7 @@ units/en/unit1/session-05-deterministic-mini-agent/conclusion.mdx
 units/en/unit1/session-05-deterministic-mini-agent/introduction.mdx
 units/en/unit1/session-05-deterministic-mini-agent/notebook.ipynb
 units/en/unit1/session-05-deterministic-mini-agent/quiz.mdx
+units/en/unit1/session-05-deterministic-mini-agent/telegram-guide.mdx
 uv.lock
 workspaces/README.md
 workspaces/news-to-telegram/fixtures/hn-front-page.json

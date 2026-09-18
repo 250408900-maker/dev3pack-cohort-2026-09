@@ -1,0 +1,202 @@
+# Your coach on Telegram (optional)
+
+> **Optional, never counted, and free.** Nothing in the course needs this. No server, no public address, no certificate, no card.
+
+You already watched it work: [demo 7](https://github.com/Gecko-Academy/dev3pack-cohort-2026-09/blob/main/demos/07_the_coach_in_a_chat.ipynb)
+answers a recorded chat, and its last cell answers a real one if you have a
+token. This page is how you get the token, and how you turn one poll into a bot
+that runs all day.
+
+- [Step 1 — make the bot](#step-1--make-the-bot)
+- [Step 2 — the token, and where it must never go](#step-2--the-token-and-where-it-must-never-go)
+- [Step 3 — the allow-list](#step-3--the-allow-list)
+- [Step 4 — the loop, about forty lines](#step-4--the-loop-about-forty-lines)
+- [The budget, in a chat](#the-budget-in-a-chat)
+- [A message is data](#a-message-is-data)
+- [Run it](#run-it)
+- [When to use something bigger: Hermes](#when-to-use-something-bigger-hermes)
+
+## Step 1 — make the bot
+
+1. Open Telegram and talk to **[@BotFather](https://t.me/BotFather)**.
+2. `/newbot` → a name, then a handle ending in `bot`.
+3. He replies with a **token**: `123456789:AAH...`. That token *is* the bot.
+   Anyone holding it can send messages as it.
+4. `/setprivacy` → **Enable**. In groups the bot then sees only messages that
+   address it, instead of everything anybody types.
+5. Message your own bot once. Then find your chat id:
+
+```
+https://api.telegram.org/bot<your-token>/getUpdates
+```
+
+**That URL contains your token.** Open it in your own browser, read the
+`"chat":{"id":...}` number, and close the tab. Never paste that URL into a chat,
+an issue, a screenshot, or an assistant.
+
+## Step 2 — the token, and where it must never go
+
+```bash
+echo 'TELEGRAM_BOT_TOKEN=123456789:AAH...' >> .env
+echo 'TELEGRAM_ALLOWED_CHATS=4242' >> .env
+```
+
+`.env` is git-ignored in this repository and stays that way.
+
+- **Read it from the environment**, never a literal: `os.environ.get("TELEGRAM_BOT_TOKEN", "")`.
+- **Never print it**, and never print a URL built from it. When a request fails,
+  print the *type* of the error — the URL carries the token.
+- **Never commit it.** If it reaches a commit, treat it as public.
+- **If it leaks:** `/revoke` in BotFather. The old token dies immediately.
+
+## Step 3 — the allow-list
+
+A handle is public. Anyone can find your bot and type into it.
+
+```python
+ALLOWED = {4242}          # your chat id, from step 1
+```
+
+Drop anything from another id **in silence**. A reply — even "you are not
+allowed" — tells a stranger there is something alive here worth poking at.
+
+## Step 4 — the loop, about forty lines
+
+Paste this into a `bot.py` **outside your course folder**. The course stays free
+of anything that holds a credential, which is why it is printed here rather than
+shipped as a file.
+
+```python
+import json, os, re, urllib.parse, urllib.request
+
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+ALLOWED = {int(x) for x in os.environ.get("TELEGRAM_ALLOWED_CHATS", "").split(",") if x.strip()}
+
+
+def telegram(method: str, **params) -> dict:
+    """One Bot API call. Returns {} on any failure: a bot must not die on one bad turn."""
+    data = urllib.parse.urlencode(params).encode()
+    url = f"https://api.telegram.org/bot{TOKEN}/{method}"
+    try:
+        with urllib.request.urlopen(url, data=data, timeout=40) as response:  # noqa: S310
+            return json.loads(response.read())
+    except Exception as error:          # the URL carries the token — print the TYPE only
+        print(f"telegram {method}: {type(error).__name__}")
+        return {}
+
+
+def serve(respond, budget: int = 3, timeout: int = 25) -> None:
+    offset, chats = 0, {}
+    print(f'listening as @{telegram("getMe").get("result", {}).get("username", "?")}')
+    while True:
+        for update in telegram("getUpdates", offset=offset, timeout=timeout).get("result", []):
+            offset = update["update_id"] + 1          # FIRST: a bad message must not repeat for ever
+            message = update.get("message", {})
+            if "text" not in message or message["chat"]["id"] not in ALLOWED:
+                continue
+            receipt = respond(message["text"], chats.setdefault(message["chat"]["id"], {"calls": 0}))
+            reply = f'{receipt["reply"]}\n\n⟨ {receipt["stopped_because"]} · {receipt["calls_used"]}/{budget} ⟩'
+            for part in chunks(reply):
+                telegram("sendMessage", chat_id=message["chat"]["id"], text=part)
+
+
+if __name__ == "__main__":
+    if not TOKEN:
+        raise SystemExit("set TELEGRAM_BOT_TOKEN in .env first")
+    serve(reply_to)      # reply_to, chunks, admit: copy them from demo 7
+```
+
+**The two lines that bite**, and neither is obvious:
+
+- **`offset = update["update_id"] + 1` comes first**, before the message is
+  handled. Acknowledge afterwards and one message that breaks your handler comes
+  back for ever, every poll, until you delete it by hand.
+- **The socket timeout must be longer than the poll timeout.** `timeout=25` asks
+  Telegram to hold the line for 25 seconds; a 10-second socket timeout means your
+  own client hangs up on a healthy call every time.
+
+## The budget, in a chat
+
+`reply_to` from demo 7 already counts calls per chat. Keep it. A chat is a
+stranger with a keyboard, and an unbounded loop is your bill — or, when the tool
+is free, the coach answering the same question four hundred times.
+
+Reset the count daily, not per message. And send the receipt line with every
+reply: `⟨ budget · 3/3 ⟩` is how the person learns the bot has limits without
+being lectured.
+
+Once you finish **`ch05-e2`**, swap `reply_to` for your own `run_loop` using the
+adapter in demo 7's section 7. The chat then runs on the loop you wrote.
+
+## A message is data
+
+Session 4's rule does not change because the text arrived from a person:
+
+```python
+if re.search(INSTRUCTION, message["text"], FLAGS):
+    continue        # drop it, and do not explain why
+```
+
+Do not reply with the reason. An attacker who learns *which* sentence was caught
+learns what to write next.
+
+**Two limits worth knowing before they surprise you:**
+
+- **4096 characters.** Telegram rejects a longer message. A coach answer with
+  three passages goes past it, so split on blank lines — `chunks()` in demo 7.
+- **Markdown is off by default here.** A page containing `*` or `_` makes
+  Telegram answer `400` on a message sent with `parse_mode="Markdown"`. Plain
+  text always sends.
+
+## Run it
+
+```bash
+uv run python bot.py          # leave the terminal open
+```
+
+In Docker, **with no `-p` flag at all**:
+
+```bash
+docker run --rm --env-file .env your-bot
+```
+
+Long polling **dials out**. There is nothing to expose, no port to open, no
+domain, no certificate. A webhook is the other way round — Telegram calls you —
+and needs a public HTTPS address on port 443, 80, 88 or 8443. That is the whole
+reason this polls instead.
+
+**One poller per token.** Start a second one and the two of them split your
+updates at random, which looks exactly like a bot that answers every other
+message.
+
+## When to use something bigger: Hermes
+
+At some point you want one agent reachable from Telegram *and* Discord *and*
+Slack, with voice notes transcribed and scheduled jobs reporting back.
+[Hermes](https://github.com/NousResearch/hermes-agent) does that, and the course
+carries a guided setup for it:
+
+```bash
+uv run python integrations/hermes-telegram/check_hermes.py
+```
+
+**Read the trade before you take it.** Hermes is a general, self-improving agent
+with persistent memory. What you built in session 5 is a bounded loop whose every
+exit you chose and can count. Both are correct; they are built for different
+trust models — and Hermes's strength, memory that shapes later behaviour, is also
+a **persistent injection surface** (sessions 11 and 14). It also needs a model
+provider key, so it costs money; the bot on this page costs nothing.
+
+The shape worth aiming at is **both**: Hermes carrying the messages, and your
+bounded loop deciding what happens.
+
+## Later: travel expenses
+
+The same chat, a different job: session 4's policy lookup and currency
+conversion, behind the same doorman, budget and receipt. It slots into exactly
+one place — a second route inside `reply_to`, beside `/page`. That needs its own
+decisions about what the bot may believe, so it is a separate piece rather than a
+paragraph here.
+
+<!-- navigation:start -->
+<!-- navigation:end -->
